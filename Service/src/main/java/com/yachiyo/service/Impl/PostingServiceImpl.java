@@ -16,7 +16,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +86,6 @@ public class PostingServiceImpl implements PostingService {
             }
             LinkLike linkLike = new LinkLike();
             linkLike.setUserId(UserId);
-            ;
             return Result.success(
                     linkLikeMapper.insert(linkLike) > 0);
         } catch (Exception e) {
@@ -163,7 +161,7 @@ public class PostingServiceImpl implements PostingService {
             Boolean isDetailSuccess = postDetailMapper.insert(postDetail) > 0;
             return Result.success(isUploadSuccess && isDetailSuccess);
         } catch (Exception e) {
-            return Result.error("500","上传帖子失败：",e.getMessage());
+            return Result.error("500","上传帖子失败",e.getMessage());
         }
     }
 
