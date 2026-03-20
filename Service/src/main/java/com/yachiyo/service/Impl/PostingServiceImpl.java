@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.yachiyo.Config.IOFileConfig;
 import com.yachiyo.dto.GetPostingResponse;
+import com.yachiyo.dto.PostEncapsulateResponse;
 import com.yachiyo.dto.UploadPostingRequest;
 import com.yachiyo.entity.*;
 import com.yachiyo.mapper.*;
@@ -138,12 +139,15 @@ public class PostingServiceImpl implements PostingService {
     public Result<Boolean> uploadPosting(UploadPostingRequest posting) {
         try {
             int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            if (ioFileConfig.checkDirExist(UserId + "/" + posting.getTitle())) {
+                ioFileConfig.createDir(UserId + "/" + posting.getTitle());
+            }
+            ioFileConfig.createDir(UserId + "/" + posting.getTitle() + "/");
+            if (!ioFileConfig.uploadFile(UserId + "/" + posting.getTitle() + "/" + "cover.jpg", posting.getCoverImage())) {
+                return Result.error("封面图片上传失败");
+            }
             for (int i = 0; i < posting.getFiles().size(); i++) {
                 MultipartFile file = posting.getFiles().get(i);
-                if (ioFileConfig.checkDirExist(UserId + "/" + posting.getTitle())) {
-                    ioFileConfig.createDir(UserId + "/" + posting.getTitle());
-                }
-                ioFileConfig.createDir(UserId + "/" + posting.getTitle() + "/");
                 if (!ioFileConfig.uploadFile(UserId + "/" + posting.getTitle() + "/" + i + "_" + file.getOriginalFilename(), file)) {
                     return Result.error("文件上传失败");
                 }
@@ -163,6 +167,7 @@ public class PostingServiceImpl implements PostingService {
         }
     }
 
+
     @Override
     public Result<GetPostingResponse> getPosting(int postingId) {
         try {
@@ -181,6 +186,23 @@ public class PostingServiceImpl implements PostingService {
             return Result.success(getPostingResponse);
         } catch (Exception e) {
             return Result.error("500", "获取帖子失败：", e.getMessage());
+        }
+    }
+
+    @Override
+    public Result<PostEncapsulateResponse> getPostingEncapsulate(int postingId) {
+        try{
+            Posting postingEntity = postingMapper.selectById(postingId);
+            if (postingEntity == null) {
+                return Result.error("帖子不存在");
+            }
+            PostEncapsulateResponse postEncapsulateResponse = new PostEncapsulateResponse();
+            postEncapsulateResponse.setTitle(postingEntity.getTitle());
+            postEncapsulateResponse.setPosterId(postingEntity.getUserId());
+            postEncapsulateResponse.setCoverImage(ioFileConfig.readFile(postingEntity.getUserId() + "/" + postingEntity.getTitle() + "/" + "cover.jpg"));
+            return Result.success(postEncapsulateResponse);
+        } catch (Exception e) {
+            return Result.error("500","获取帖子简述失败：",e.getMessage());
         }
     }
 

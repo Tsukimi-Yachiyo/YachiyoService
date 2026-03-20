@@ -1,5 +1,6 @@
 package com.yachiyo.controller;
 
+import com.yachiyo.dto.PosterDetailResponse;
 import com.yachiyo.dto.UserDetailResponse;
 import com.yachiyo.result.Result;
 import com.yachiyo.service.UserService;
@@ -61,5 +62,14 @@ public class UserDetailController {
     @PostMapping("/detail/update")
     public Result<Boolean> updateUserDetail(@RequestBody UserDetailResponse userDetailResponse) {
         return userService.updateUserDetail(userDetailResponse);
+    }
+
+    /**
+     * 获取某用户详情
+     * @return 用户详情
+     */
+    @PostMapping("/detail/get/user")
+    public Result<PosterDetailResponse> getUserDetail(Integer userId) {
+        return userService.getPosterDetail(userId);
     }
 }

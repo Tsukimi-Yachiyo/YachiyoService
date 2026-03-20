@@ -2,6 +2,7 @@ package com.yachiyo.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.yachiyo.Config.IOFileConfig;
+import com.yachiyo.dto.PosterDetailResponse;
 import com.yachiyo.dto.UserDetailResponse;
 import com.yachiyo.entity.User;
 import com.yachiyo.entity.UserDetail;
@@ -79,6 +80,27 @@ public class UserServiceImpl implements UserService {
         }
         return Result.success(avatar);
     }
+
+    @Override
+    public Result<PosterDetailResponse> getPosterDetail(Integer userId) {
+        try {
+            // 从数据库中获取用户详情
+            QueryWrapper<UserDetail> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("id", userId);
+            UserDetail userDetail = userDetailMapper.selectOne(queryWrapper);
+            if (userDetail == null) {
+                 return Result.error("404", "用户不存在");
+            }
+            PosterDetailResponse posterDetailResponse = new PosterDetailResponse();
+            posterDetailResponse.setUserName(userDetail.getUserName());
+            posterDetailResponse.setUserAvatar(ioFileConfig.readFile(userId + "/avatar.jpg"));
+            return Result.success(posterDetailResponse);
+        } catch (Exception e) {
+                return Result.error("500", "获取用户详情失败");
+        }
+    }
+
+
 
     /**
      * 从UserDetailResponse获取UserDetail

@@ -1,5 +1,6 @@
 package com.yachiyo.service;
 
+import com.yachiyo.dto.PosterDetailResponse;
 import com.yachiyo.dto.UserDetailResponse;
 import com.yachiyo.result.Result;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,4 +32,11 @@ public interface UserService {
      * @return 用户头像
      */
      Result<byte[]> getUserAvatar();
+
+     /**
+     * 获取某用户详情
+     * @param userId 用户ID
+     * @return 用户详情
+     */
+     Result<PosterDetailResponse> getPosterDetail(Integer userId);
 }

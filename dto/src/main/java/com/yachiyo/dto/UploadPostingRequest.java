@@ -14,5 +14,7 @@ public class UploadPostingRequest {
 
     private String type;
 
+    private MultipartFile coverImage;
+
     private List<MultipartFile> files;
 }

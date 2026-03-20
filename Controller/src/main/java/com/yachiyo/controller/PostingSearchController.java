@@ -1,5 +1,6 @@
 package com.yachiyo.controller;
 
+import com.yachiyo.dto.PostEncapsulateResponse;
 import com.yachiyo.result.Result;
 import com.yachiyo.service.PostingService;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +42,16 @@ public class PostingSearchController {
     @PostMapping("/collection")
     public Result<List<Integer>> collectionPosting() {
         return postingService.getCollectionPosting();
+    }
+
+    /**
+     * 获取帖子简述
+     *
+     * @param postingId 帖子id
+     * @return 帖子简述
+     */
+    @PostMapping("/encapsulate")
+    public Result<PostEncapsulateResponse> getPostingEncapsulate(@RequestParam Integer postingId) {
+        return postingService.getPostingEncapsulate(postingId);
     }
 }

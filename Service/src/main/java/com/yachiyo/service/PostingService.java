@@ -1,6 +1,7 @@
 package com.yachiyo.service;
 
 import com.yachiyo.dto.GetPostingResponse;
+import com.yachiyo.dto.PostEncapsulateResponse;
 import com.yachiyo.dto.UploadPostingRequest;
 import com.yachiyo.result.Result;
 
@@ -52,6 +53,11 @@ public interface PostingService {
      * 获取帖子详情
      */
     Result<GetPostingResponse> getPosting(int postingId);
+
+    /**
+     * 获取帖子简述
+     */
+    Result<PostEncapsulateResponse> getPostingEncapsulate(int postingId);
 
     /**
      * 删除帖子
