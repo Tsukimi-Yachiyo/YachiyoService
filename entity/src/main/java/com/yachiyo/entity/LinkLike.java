@@ -6,7 +6,7 @@ import lombok.Data;
 @Data @TableName("posting_like")
 public class LinkLike {
 
-    private int userId;
+    private Long userId;
 
-    private int postingId;
+    private Long postingId;
 }

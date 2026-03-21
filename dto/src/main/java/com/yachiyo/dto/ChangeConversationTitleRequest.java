@@ -6,8 +6,7 @@ import lombok.Data;
 @Data
 public class ChangeConversationTitleRequest {
 
-    @NotBlank(message = "对话ID不能为空")
-    private int conversationId;
+    private Long conversationId;
 
     @NotBlank(message = "标题不能为空")
     private String title;

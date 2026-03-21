@@ -14,7 +14,7 @@ import java.util.Date;
 public class UserDetail {
 
     @TableId(value = "id")
-    private Integer userId;
+    private Long userId;
 
     @TableField(value = "introduction")
     private String userIntroduction;

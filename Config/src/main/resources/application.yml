@@ -8,9 +8,25 @@ spring:
     include: secret
     active: dev
 
+# mybatis-plus 配置
+mybatis-plus:
+  global-config:
+    db-config:
+      id-type: assign-id
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.yachiyo.entity
+
+# jwt 配置
+jwt:
+  secret: "12345678901234567890123456789012"
+  expiration: 3600000
+  token-header: "Authorization"
+  token-prefix: "Bearer "
+
 # 服务器配置
 server:
-  port: 8080
   tomcat:
     connection-timeout: PT30S
     max-connections: 500

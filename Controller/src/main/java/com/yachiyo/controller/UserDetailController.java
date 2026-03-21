@@ -67,7 +67,7 @@ public class UserDetailController {
      * @return 用户详情
      */
     @PostMapping("/detail/get/user")
-    public Result<PosterDetailResponse> getUserDetail(Integer userId) {
+    public Result<PosterDetailResponse> getUserDetail(Long userId) {
         return userService.getPosterDetail(userId);
     }
 }

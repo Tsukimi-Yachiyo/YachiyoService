@@ -12,37 +12,37 @@ public interface PostingService {
     /**
      * 搜索帖子
      */
-    Result<List<Integer>> searchPosting(String keyword);
+    Result<List<Long>> searchPosting(String keyword);
 
     /**
      * 点赞的帖子
      */
-    Result<List<Integer>> getLikePosting();
+    Result<List<Long>> getLikePosting();
 
     /**
      * 收藏的帖子
      */
-    Result<List<Integer>> getCollectionPosting();
+    Result<List<Long>> getCollectionPosting();
 
     /**
      * 点赞
      */
-    Result<Boolean> likePosting(int postingId);
+    Result<Boolean> likePosting(Long postingId);
 
     /**
      * 收藏
      */
-    Result<Boolean> collectionPosting(int postingId);
+    Result<Boolean> collectionPosting(Long postingId);
 
     /**
      * 取消点赞
      */
-    Result<Boolean> cancelLikePosting(int postingId);
+    Result<Boolean> cancelLikePosting(Long postingId);
 
     /**
      * 取消收藏
      */
-    Result<Boolean> cancelCollectionPosting(int postingId);
+    Result<Boolean> cancelCollectionPosting(Long postingId);
 
     /**
      * 上传帖子
@@ -52,15 +52,15 @@ public interface PostingService {
     /**
      * 获取帖子详情
      */
-    Result<GetPostingResponse> getPosting(int postingId);
+    Result<GetPostingResponse> getPosting(Long postingId);
 
     /**
      * 获取帖子简述
      */
-    Result<PostEncapsulateResponse> getPostingEncapsulate(int postingId);
+    Result<PostEncapsulateResponse> getPostingEncapsulate(Long postingId);
 
     /**
      * 删除帖子
      */
-    Result<Boolean> deletePosting(int postingId);
+    Result<Boolean> deletePosting(Long postingId);
 }

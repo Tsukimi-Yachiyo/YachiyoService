@@ -116,11 +116,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String userEntrySystem(User user) throws IOException {
-        int userId = user.getId();        //检查用户文件夹是否存在
+        Long userId = user.getId();        //检查用户文件夹是否存在
         if (ioFileConfig.checkDirExist(String.valueOf(userId))) {
             ioFileConfig.createDir(String.valueOf(userId));
         }
-        String token = jwtUtils.generateToken((long) userId, user.getName(), securitySafeToolConfig.getUnique(userId));
+        String token = jwtUtils.generateToken(userId, user.getName(), securitySafeToolConfig.getUnique(userId));
         boolean isBirthday = fastMethodConfig.getBirthday(user);
         HashOperations<String, String, String> hash = redisTemplate.opsForHash();
         hash.put("user:" + userId, "birthday", String.valueOf(isBirthday));

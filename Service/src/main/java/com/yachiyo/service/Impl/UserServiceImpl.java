@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result<UserDetailResponse> getUserDetail() {
         // 从安全上下文获取当前用户id
-        int userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+        Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
         QueryWrapper<UserDetail> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("id", userId);
         UserDetail userDetail = userDetailMapper.selectOne(queryWrapper);
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result<Boolean> updateUserAvatar(MultipartFile userAvatar) {
         // 从安全上下文获取当前用户id
-        int userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+        Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
         if (!ioFileConfig.uploadFile(userId + "/avatar.jpg", userAvatar)) {
             return Result.error("500", "上传用户头像失败");
         }
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result<byte[]> getUserAvatar() {
         // 从安全上下文获取当前用户id
-        int userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+        Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
         byte[] avatar = ioFileConfig.readFile(userId + "/avatar.jpg");
         if (avatar == null) {
             return Result.error("404", "用户头像不存在");
@@ -81,8 +81,8 @@ public class UserServiceImpl implements UserService {
         return Result.success(avatar);
     }
 
-    @Override
-    public Result<PosterDetailResponse> getPosterDetail(Integer userId) {
+     @Override
+    public Result<PosterDetailResponse> getPosterDetail(Long userId) {
         try {
             // 从数据库中获取用户详情
             QueryWrapper<UserDetail> queryWrapper = new QueryWrapper<>();
@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
      * 从UserDetailResponse获取UserDetail
      */
     private static @NonNull UserDetail getUserDetail(UserDetailResponse userDetailResponse) {
-        int userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+        Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
         UserDetail userDetail = new UserDetail();
         userDetail.setUserId(userId);
 

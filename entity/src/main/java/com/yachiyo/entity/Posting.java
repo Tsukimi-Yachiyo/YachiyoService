@@ -6,9 +6,9 @@ import lombok.Data;
 @Data @TableName("posting")
 public class Posting {
 
-    private int id;
+    private Long id;
 
-    private int userId;
+    private Long userId;
 
     private String title;
 

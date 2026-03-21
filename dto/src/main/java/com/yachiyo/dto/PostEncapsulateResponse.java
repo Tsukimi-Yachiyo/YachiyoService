@@ -7,7 +7,7 @@ public class PostEncapsulateResponse {
 
     private String title;
 
-    private int posterId;
+    private Long posterId;
 
     private byte[] coverImage;
 }

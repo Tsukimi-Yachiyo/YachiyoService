@@ -31,7 +31,7 @@ public class SecuritySafeToolConfig {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    public String getUnique(int userId) {
+    public String getUnique(Long userId) {
         Random rand = new Random();
         int randomNum = rand.nextInt(Integer.MAX_VALUE);
         HashOperations<String, String, Object> hashOps = redisTemplate.opsForHash();

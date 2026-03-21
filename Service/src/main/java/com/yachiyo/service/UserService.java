@@ -38,5 +38,5 @@ public interface UserService {
      * @param userId 用户ID
      * @return 用户详情
      */
-     Result<PosterDetailResponse> getPosterDetail(Integer userId);
+     Result<PosterDetailResponse> getPosterDetail(Long userId);
 }

@@ -21,7 +21,7 @@ public class HistoryServiceImpl implements HistoryService {
     @Override
     public Result<List<PromptResponse>> getHistory(String conservationId) {
         try {
-            return Result.success(chatMemoryHistoryToolConfig.getHistory(Integer.parseInt(conservationId)));
+            return Result.success(chatMemoryHistoryToolConfig.getHistory(Long.parseLong(conservationId)));
         } catch (Exception e) {
             log.error("获取会话记忆失败", e);
             return Result.error("获取会话记忆失败");
@@ -41,11 +41,11 @@ public class HistoryServiceImpl implements HistoryService {
     @Override
     public Result<Boolean> clearHistory(String conservationId) {
         try {
-            chatMemoryHistoryToolConfig.clearHistory(Integer.parseInt(conservationId));
+            chatMemoryHistoryToolConfig.clearHistory(Long.parseLong(conservationId));
             return Result.success(true);
         } catch (Exception e) {
             log.error("删除会话失败", e);
-            return Result.error("删除会话失败");
+            return Result.error("500","删除会话失败", e.getMessage());
         }
     }
 

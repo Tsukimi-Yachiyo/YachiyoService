@@ -7,7 +7,7 @@ import lombok.Data;
 @Data @TableName("posting_collection")
 public class LinkCollection {
 
-    private int userId;
+    private Long userId;
 
-    private int postingId;
+    private Long postingId;
 }

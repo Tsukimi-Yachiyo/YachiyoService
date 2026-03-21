@@ -35,14 +35,14 @@ public class ChatMemoryHistoryToolConfig {
      * @param id 会话id
      * @param prompt 问题
      */
-    public void save(int id,String prompt) throws Exception {
-        Conversation conversation = conversationMapper.selectById(id);
+    public void save(String id,String prompt) throws Exception {
+        Conversation conversation = conversationMapper.selectById(Long.parseLong(id));
         if (conversation == null) {
             throw new Exception("会话不存在");
         }
         Message message = new Message();
         message.setId(id);
-        if (messageMapper.selectList(new QueryWrapper<Message>().eq("conversation_id",conversation.getId())).isEmpty()) {
+        if (messageMapper.selectList(new QueryWrapper<Message>().eq("conversation_id",id)).isEmpty()) {
             conversation.setTitle(prompt);
             conversationMapper.updateById(conversation);
         }
@@ -52,8 +52,8 @@ public class ChatMemoryHistoryToolConfig {
      * 创建对话
      * @return 是否创建成功
      */
-    public int create() throws Exception {
-        int id = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+    public Long create() throws Exception {
+        Long id = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
         Conversation conversation = new Conversation();
         conversation.setUserId(id);
         if (conversationMapper.insert(conversation) > 0) {
@@ -68,10 +68,11 @@ public class ChatMemoryHistoryToolConfig {
      * @param id 会话id
      * @return 对话记忆
      */
-    public List<PromptResponse> getHistory(int id) throws Exception {
+    public List<PromptResponse> getHistory(Long id) throws Exception {
         Conversation conversation = conversationMapper.selectById(id);
+        String sId = id.toString();
         if (conversation != null) {
-            List<Message> messages = messageMapper.selectList(new QueryWrapper<Message>().eq("conversation_id", id));
+            List<Message> messages = messageMapper.selectList(new QueryWrapper<Message>().eq("conversation_id", sId));
             if (messages != null) {
                 List<String> user = new ArrayList<>();
                 List<String> yachiyo = new ArrayList<>();
@@ -94,7 +95,7 @@ public class ChatMemoryHistoryToolConfig {
      * 清空对话记忆
      * @param id 会话id
      */
-    public void clearHistory(int id) throws Exception {
+    public void clearHistory(Long id) throws Exception {
         if (conversationMapper.selectById(id) == null) {
             throw new Exception("会话不存在");
         }else {
@@ -103,12 +104,6 @@ public class ChatMemoryHistoryToolConfig {
             }else {
                 throw new Exception("删除会话失败");
             }
-
-        }
-        if (messageMapper.delete(new QueryWrapper<Message>().eq("conversation_id", id)) > 0) {
-            log.info("删除会话记忆成功");
-        }else {
-            throw new Exception("删除会话记忆失败");
         }
     }
 
@@ -116,7 +111,7 @@ public class ChatMemoryHistoryToolConfig {
      * 清空所有对话记忆
      */
     public void clearAllHistory() throws Exception {
-        int userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+        Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
         conversationMapper.deleteById(userId);
         if (messageMapper.delete(new QueryWrapper<Message>().eq("user_id", userId)) > 0) {
             log.info("清空所有会话记忆成功");

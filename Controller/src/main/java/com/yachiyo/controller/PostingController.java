@@ -20,7 +20,7 @@ public class PostingController {
      * 上传帖子
      */
     @PostMapping("/upload")
-    public Result<Boolean> uploadPosting(@Validated @RequestBody UploadPostingRequest request) {
+    public Result<Boolean> uploadPosting(@RequestBody UploadPostingRequest request) {
         return postingService.uploadPosting(request);
     }
 
@@ -28,7 +28,7 @@ public class PostingController {
      * 获取帖子
      */
     @PostMapping("/get")
-    public Result<GetPostingResponse> getPosting(@RequestParam int postingId) {
+    public Result<GetPostingResponse> getPosting(@RequestParam Long postingId) {
         return postingService.getPosting(postingId);
     }
 
@@ -36,7 +36,7 @@ public class PostingController {
      * 点赞帖子
      */
     @PostMapping("/like")
-    public Result<Boolean> likePosting(@RequestParam int postingId) {
+    public Result<Boolean> likePosting(@RequestParam Long postingId) {
         return postingService.likePosting(postingId);
     }
 
@@ -44,7 +44,7 @@ public class PostingController {
      * 收藏帖子
      */
     @PostMapping("/collection")
-    public Result<Boolean> collectionPosting(@RequestParam int postingId) {
+    public Result<Boolean> collectionPosting(@RequestParam Long postingId) {
         return postingService.collectionPosting(postingId);
     }
 
@@ -52,7 +52,7 @@ public class PostingController {
      * 取消点赞帖子
      */
     @PostMapping("/cancelLike")
-    public Result<Boolean> cancelLikePosting(@RequestParam int postingId) {
+    public Result<Boolean> cancelLikePosting(@RequestParam Long postingId) {
         return postingService.cancelLikePosting(postingId);
     }
 
@@ -60,7 +60,7 @@ public class PostingController {
      * 取消收藏帖子
      */
     @PostMapping("/cancelCollection")
-    public Result<Boolean> cancelCollectionPosting(@RequestParam int postingId) {
+    public Result<Boolean> cancelCollectionPosting(@RequestParam Long postingId) {
         return postingService.cancelCollectionPosting(postingId);
     }
 
@@ -68,7 +68,7 @@ public class PostingController {
      * 删除帖子
      */
     @PostMapping("/delete")
-    public Result<Boolean> deletePosting(@RequestParam int postingId) {
+    public Result<Boolean> deletePosting(@RequestParam Long postingId) {
         return postingService.deletePosting(postingId);
     }
 }

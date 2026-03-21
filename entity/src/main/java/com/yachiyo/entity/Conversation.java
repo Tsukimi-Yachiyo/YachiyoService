@@ -11,9 +11,9 @@ import java.util.Date;
 public class Conversation {
 
     @TableId(value = "conversation_id",type = IdType.AUTO)
-    int id;
+    Long id;
 
-    int userId;
+    Long userId;
 
     String title;
 

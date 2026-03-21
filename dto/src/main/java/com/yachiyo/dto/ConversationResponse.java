@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ConversationResponse {
 
-    private Integer id;
+    private Long id;
 
     private String title;
 

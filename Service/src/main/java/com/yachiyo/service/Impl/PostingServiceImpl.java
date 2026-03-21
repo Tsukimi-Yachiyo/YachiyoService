@@ -41,7 +41,7 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<List<Integer>> searchPosting(String keyword) {
+    public Result<List<Long>> searchPosting(String keyword) {
         try {
             LambdaQueryWrapper<Posting> queryWrapper = new LambdaQueryWrapper<>();
             if (StringUtils.isNotBlank(keyword) && keyword.length() <= 10) {
@@ -50,7 +50,7 @@ public class PostingServiceImpl implements PostingService {
             } else {
                 return Result.error("关键词长度不能超过10个字符");
             }
-            List<Integer> postingIds = postingMapper.selectList(queryWrapper).stream().map(Posting::getId).collect(Collectors.toList());
+            List<Long> postingIds = postingMapper.selectList(queryWrapper).stream().map(Posting::getId).collect(Collectors.toList());
             return Result.success(postingIds);
         } catch (Exception e) {
             return Result.error("500","搜索帖子失败：",e.getMessage());
@@ -58,9 +58,9 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<List<Integer>> getLikePosting() {
+    public Result<List<Long>> getLikePosting() {
         try {
-            int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             return Result.success(linkLikeMapper.selectList(new LambdaQueryWrapper<LinkLike>().eq(LinkLike::getUserId, UserId)).stream().map(LinkLike::getPostingId).toList());
         } catch (Exception e) {
             return Result.error("500","获取点赞帖子失败：",e.getMessage());
@@ -68,9 +68,9 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<List<Integer>> getCollectionPosting() {
+    public Result<List<Long>> getCollectionPosting() {
         try {
-            int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             return Result.success(linkCollectionMapper.selectList(new LambdaQueryWrapper<LinkCollection>().eq(LinkCollection::getUserId, UserId)).stream().map(LinkCollection::getUserId).toList());
         } catch (Exception e) {
             return Result.error("500","获取收藏帖子失败：",e.getMessage());
@@ -78,9 +78,9 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<Boolean> likePosting(int postingId) {
+    public Result<Boolean> likePosting(Long postingId) {
         try {
-            int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             if (linkLikeMapper.selectByMap(Map.of("user_id", UserId, "posting_id", postingId)) != null) {
                 return Result.error("您已点赞该帖子");
             }
@@ -94,9 +94,9 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<Boolean> collectionPosting(int postingId) {
+    public Result<Boolean> collectionPosting(Long postingId) {
         try {
-            int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             if (linkCollectionMapper.selectByMap(Map.of("user_id", UserId, "posting_id", postingId)) != null) {
                 return Result.error("您已收藏该帖子");
             }
@@ -112,9 +112,9 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<Boolean> cancelLikePosting(int postingId) {
+    public Result<Boolean> cancelLikePosting(Long postingId) {
         try {
-            int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             return Result.success(
                     linkLikeMapper.deleteByMap(Map.of("user_id", UserId, "posting_id", postingId)) > 0);
         } catch (Exception e) {
@@ -123,9 +123,9 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<Boolean> cancelCollectionPosting(int postingId) {
+    public Result<Boolean> cancelCollectionPosting(Long postingId) {
         try {
-            int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             return Result.success(
                     linkCollectionMapper.deleteByMap(Map.of("user_id", UserId, "posting_id", postingId)) > 0);
         } catch (Exception e) {
@@ -136,7 +136,7 @@ public class PostingServiceImpl implements PostingService {
     @Override
     public Result<Boolean> uploadPosting(UploadPostingRequest posting) {
         try {
-            int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             if (ioFileConfig.checkDirExist(UserId + "/" + posting.getTitle())) {
                 ioFileConfig.createDir(UserId + "/" + posting.getTitle());
             }
@@ -167,9 +167,9 @@ public class PostingServiceImpl implements PostingService {
 
 
     @Override
-    public Result<GetPostingResponse> getPosting(int postingId) {
+    public Result<GetPostingResponse> getPosting(Long postingId) {
         try {
-            int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             Posting postingEntity = postingMapper.selectById(postingId);
             if (postingEntity == null) {
                 return Result.error("帖子不存在");
@@ -188,7 +188,7 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<PostEncapsulateResponse> getPostingEncapsulate(int postingId) {
+    public Result<PostEncapsulateResponse> getPostingEncapsulate(Long postingId) {
         try{
             Posting postingEntity = postingMapper.selectById(postingId);
             if (postingEntity == null) {
@@ -205,9 +205,9 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<Boolean> deletePosting(int postingId) {
+    public Result<Boolean> deletePosting(Long postingId) {
         try {
-            int UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             Posting postingEntity = postingMapper.selectById(postingId);
             if (postingEntity == null) {
                 return Result.error("帖子不存在");

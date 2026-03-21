@@ -11,6 +11,7 @@ import com.yachiyo.service.ChatService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
@@ -35,6 +37,9 @@ public class ChatServiceImpl implements ChatService {
     private FastMethodConfig fastMethodConfig;
 
     @Autowired
+    private Advisor retrievalAugmentationAdvisor;
+
+    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
     @Override
@@ -43,14 +48,14 @@ public class ChatServiceImpl implements ChatService {
         String message = chatRequest.getMessage();
         // 检查会话是否存在
         try {
-            chatMemoryHistoryToolConfig.save(Integer.parseInt(conversationId), message);
+            chatMemoryHistoryToolConfig.save(conversationId, message);
         } catch (Exception e) {
             log.error("保存对话记忆失败", e);
             return Result.error("500", "保存对话记忆失败");
         }
         String response = chatClient.prompt()
                 .user(message)
-                .advisors(advisor -> advisor.param(CONVERSATION_ID, conversationId))
+                .advisors(advisor -> advisor.param(CONVERSATION_ID, Long.parseLong(conversationId)))
                 .call()
                 .content();
         return Result.success(response);
@@ -59,7 +64,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public Result<String> Create() {
         try {
-            int id = chatMemoryHistoryToolConfig.create();
+            Long id = chatMemoryHistoryToolConfig.create();
             return Result.success(String.valueOf(id));
         } catch (Exception e) {
             log.error("创建会话失败", e);
@@ -73,7 +78,7 @@ public class ChatServiceImpl implements ChatService {
         String message = chatRequest.getMessage();
         // 检查会话是否存在
         try {
-            chatMemoryHistoryToolConfig.save(Integer.parseInt(conversationId), message);
+            chatMemoryHistoryToolConfig.save(conversationId, message);
         } catch (Exception e) {
             log.error("保存对话记忆失败", e);
             return null;
@@ -81,7 +86,7 @@ public class ChatServiceImpl implements ChatService {
 
         String systemMessage = "";
         try {
-            int userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             boolean isBirthday = redisTemplate.opsForHash().get("user:" + userId, "birthday").equals("true");
             if(isBirthday) {
                 systemMessage += "今天是用户的生日，";

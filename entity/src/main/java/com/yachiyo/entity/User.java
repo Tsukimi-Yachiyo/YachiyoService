@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class User {
 
     @TableId(value = "user_id",type = IdType.AUTO)
-    int id;
+    Long id;
 
     String name;
 

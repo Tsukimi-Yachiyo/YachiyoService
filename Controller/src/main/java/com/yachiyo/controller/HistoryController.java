@@ -51,9 +51,11 @@ public class HistoryController {
      * @return 删除结果
      */
     @GetMapping("/clear/{id}")
-    public Result<Boolean> clearHistory(@PathVariable String id) throws Exception {
-        return historyService.clearHistory(id);
+    public Result<Boolean> clearHistory(@PathVariable Long id) throws Exception {
+        return historyService.clearHistory(id.toString());
     }
+
+
 
     /**
      * 清空所有对话记忆

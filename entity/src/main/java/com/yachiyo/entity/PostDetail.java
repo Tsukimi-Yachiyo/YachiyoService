@@ -6,11 +6,11 @@ import lombok.Data;
 @Data @TableName("posting_detail")
 public class PostDetail {
 
-    private int id;
+    private Long id;
 
-    private int like;
+    private Long like;
 
-    private int collection;
+    private Long collection;
 
-    private int read;
+    private Long read;
 }

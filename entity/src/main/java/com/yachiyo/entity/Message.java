@@ -12,7 +12,7 @@ import java.util.Date;
 public class Message {
 
     @TableId("conversation_id")
-    int id;
+    String id;
 
     String content;
 

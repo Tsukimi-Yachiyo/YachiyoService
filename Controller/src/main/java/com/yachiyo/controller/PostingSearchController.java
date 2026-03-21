@@ -24,7 +24,7 @@ public class PostingSearchController {
      * 搜索帖子
      */
     @PostMapping("/search")
-    public Result<List<Integer>> searchPosting(@RequestParam String keyword) {
+    public Result<List<Long>> searchPosting(@RequestParam String keyword) {
         return postingService.searchPosting(keyword);
     }
 
@@ -32,7 +32,7 @@ public class PostingSearchController {
      * 点赞的帖子
      */
     @PostMapping("/like")
-    public Result<List<Integer>> likePosting() {
+    public Result<List<Long>> likePosting() {
         return postingService.getLikePosting();
     }
 
@@ -40,7 +40,7 @@ public class PostingSearchController {
      * 收藏的帖子
      */
     @PostMapping("/collection")
-    public Result<List<Integer>> collectionPosting() {
+    public Result<List<Long>> collectionPosting() {
         return postingService.getCollectionPosting();
     }
 
@@ -51,7 +51,7 @@ public class PostingSearchController {
      * @return 帖子简述
      */
     @PostMapping("/encapsulate")
-    public Result<PostEncapsulateResponse> getPostingEncapsulate(@RequestParam Integer postingId) {
+    public Result<PostEncapsulateResponse> getPostingEncapsulate(@RequestParam Long postingId) {
         return postingService.getPostingEncapsulate(postingId);
     }
 }
