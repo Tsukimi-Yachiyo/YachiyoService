@@ -85,11 +85,9 @@ public class UserServiceImpl implements UserService {
     public Result<PosterDetailResponse> getPosterDetail(Long userId) {
         try {
             // 从数据库中获取用户详情
-            QueryWrapper<UserDetail> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("id", userId);
-            UserDetail userDetail = userDetailMapper.selectOne(queryWrapper);
+            UserDetail userDetail = userDetailMapper.selectById(userId);
             if (userDetail == null) {
-                 return Result.error("404", "用户不存在");
+                 return Result.error("404", "用户不存在"+userId);
             }
             PosterDetailResponse posterDetailResponse = new PosterDetailResponse();
             posterDetailResponse.setUserName(userDetail.getUserName());

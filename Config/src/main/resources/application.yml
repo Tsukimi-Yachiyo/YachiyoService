@@ -33,7 +33,7 @@ server:
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/html,text/xml,text/plain,text/css,text/javascript,application/javascript
-    min-response-size: 2048
+    min-response-size: 10485760
   ssl:
     enabled: false
   forward-headers-strategy: framework

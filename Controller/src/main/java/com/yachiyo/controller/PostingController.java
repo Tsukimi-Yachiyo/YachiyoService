@@ -7,6 +7,9 @@ import com.yachiyo.service.PostingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v2/posting")
@@ -20,8 +23,13 @@ public class PostingController {
      * 上传帖子
      */
     @PostMapping("/upload")
-    public Result<Boolean> uploadPosting(@RequestBody UploadPostingRequest request) {
-        return postingService.uploadPosting(request);
+    public Result<Boolean> uploadPosting(
+            @RequestParam String title,
+            @RequestParam String content,
+            @RequestParam String type,
+            @RequestParam(required = false) MultipartFile coverImage,
+            @RequestPart(required = false) List<MultipartFile> files) {
+        return postingService.uploadPosting(new UploadPostingRequest(title, content, type, coverImage, files));
     }
 
     /**
@@ -65,10 +73,50 @@ public class PostingController {
     }
 
     /**
+     * 获取帖子的收藏数
+     */
+    @PostMapping("/getCollectionCount")
+    public Result<Long> getCollectionCount(@RequestParam Long postingId) {
+        return postingService.getCollectionCount(postingId);
+    }
+
+    /**
+     * 获取帖子的点赞数
+     */
+    @PostMapping("/getLikeCount")
+    public Result<Long> getLikeCount(@RequestParam Long postingId) {
+        return postingService.getLikeCount(postingId);
+    }
+
+    /**
+     * 判断是否点赞帖子
+     */
+    @PostMapping("/isLiked")
+    public Result<Boolean> isLiked(@RequestParam Long postingId) {
+        return postingService.isLiked(postingId);
+    }
+
+    /**
+     * 判断是否收藏帖子
+     */
+    @PostMapping("/isCollected")
+    public Result<Boolean> isCollected(@RequestParam Long postingId) {
+        return postingService.isCollected(postingId);
+    }
+
+    /**
      * 删除帖子
      */
     @PostMapping("/delete")
     public Result<Boolean> deletePosting(@RequestParam Long postingId) {
         return postingService.deletePosting(postingId);
+    }
+
+    /**
+     * 获取自己的帖子
+     */
+    @PostMapping("/getMyPosting")
+    public Result<Long> getMyPosting() {
+        return postingService.getMyPosting();
     }
 }

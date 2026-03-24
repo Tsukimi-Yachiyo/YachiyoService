@@ -60,7 +60,32 @@ public interface PostingService {
     Result<PostEncapsulateResponse> getPostingEncapsulate(Long postingId);
 
     /**
+     * 获取帖子的收藏数
+     */
+    Result<Long> getCollectionCount(Long postingId);
+
+    /**
+     * 获取帖子的点赞数
+     */
+    Result<Long> getLikeCount(Long postingId);
+
+    /**
+     * 判断是否点赞帖子
+     */
+    Result<Boolean> isLiked(Long postingId);
+
+    /**
+     * 判断是否收藏帖子
+     */
+    Result<Boolean> isCollected(Long postingId);
+
+    /**
      * 删除帖子
      */
     Result<Boolean> deletePosting(Long postingId);
+
+    /**
+     * 获取自己的帖子
+     */
+    Result<Long> getMyPosting();
 }

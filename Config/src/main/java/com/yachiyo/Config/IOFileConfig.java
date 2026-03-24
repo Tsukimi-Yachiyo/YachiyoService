@@ -5,10 +5,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 public class IOFileConfig {
@@ -97,8 +96,20 @@ public class IOFileConfig {
      * @return 文件名数组
      */
     public String[] getFileNames(String dirName) throws IOException {
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(dirName))) {
-            return Files.list(Paths.get(UPLOAD_FILE_PATH + dirName)).toArray(String[]::new);
+        Path dir = Paths.get(UPLOAD_FILE_PATH + dirName);
+        try (DirectoryStream<Path> _ = Files.newDirectoryStream(dir)) {
+            Path[] paths = Files.list(dir).toArray(Path[]::new);
+            List<String> fileNames = new ArrayList<>();
+            for (Path path : paths) {
+                if (Files.isDirectory(path)) {
+                    continue;
+                }
+                fileNames.add(path.getFileName().toString());
+            }
+            return fileNames.toArray(new String[0]);
+        }catch (NoSuchFileException e){
+            e.printStackTrace();
+            return new String[0];
         }
     }
 

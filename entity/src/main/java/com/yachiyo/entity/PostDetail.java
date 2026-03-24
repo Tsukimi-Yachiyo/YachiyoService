@@ -8,9 +8,9 @@ public class PostDetail {
 
     private Long id;
 
-    private Long like;
+    private Long love;
 
     private Long collection;
 
-    private Long read;
+    private Long reading;
 }

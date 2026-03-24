@@ -7,10 +7,7 @@ import com.yachiyo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -67,7 +64,7 @@ public class UserDetailController {
      * @return 用户详情
      */
     @PostMapping("/detail/get/user")
-    public Result<PosterDetailResponse> getUserDetail(Long userId) {
+    public Result<PosterDetailResponse> getUserDetail(@RequestParam Long userId) {
         return userService.getPosterDetail(userId);
     }
 }

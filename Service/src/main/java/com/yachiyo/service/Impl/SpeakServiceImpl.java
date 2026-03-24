@@ -27,7 +27,7 @@ public class SpeakServiceImpl implements SpeakService {
         ttsRequest.setText_language("ja");
 
         // 发送请求到http://localhost:9882, 获取response.context中的二进制语言数据
-        return restTemplate.postForObject("http://0.0.0.0:9882", ttsRequest, byte[].class);
+        return restTemplate.postForObject("http://tts_yachiyo.fucku.top", ttsRequest, byte[].class);
     }
 
 }

@@ -9,5 +9,7 @@ public class GetPostingResponse {
 
     private String content;
 
+    private List<String> filenames;
+
     private List<byte[]> files;
 }

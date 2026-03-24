@@ -200,6 +200,83 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-module-jars</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/dist/modules</outputDirectory>
+                            <resources>
+                                <!-- 复制 common 模块的 jar -->
+                                <resource>
+                                    <directory>${project.basedir}/Common/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                                <!-- 复制 api 模块的 jar -->
+                                <resource>
+                                    <directory>${project.basedir}/Config/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                                <!-- 复制 web 模块的 jar -->
+                                <resource>
+                                    <directory>${project.basedir}/Controller/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+
+                                <resource>
+                                    <directory>${project.basedir}/dto/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/entity/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/Filter/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/Mapper/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/Service/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>${project.basedir}/Utils/target</directory>
+                                    <includes>
+                                        <include>*.jar</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 <!--            <plugin>-->
 <!--                <groupId>org.springframework.boot</groupId>-->
 <!--                <artifactId>spring-boot-maven-plugin</artifactId>-->

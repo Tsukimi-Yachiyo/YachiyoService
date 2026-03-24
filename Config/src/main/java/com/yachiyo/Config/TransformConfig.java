@@ -8,8 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TransformConfig {
 
-
-
     /**
      * 文本翻译方法
      * @param text 待翻译文本

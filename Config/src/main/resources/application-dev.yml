@@ -31,26 +31,31 @@ spring:
           auth: true
           ssl:
             enable: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB # 单个文件大小限制
+      max-request-size: 10MB # 总请求大小限制颜色块
   # 模型配置
   ai:
     vectorstore:
       pgvector:
-        initialize-schema: off
-        dimensions: 5120
+        initialize-schema: true
+        dimensions: 1024
     chat:
       memory:
         repository:
           jdbc:
             initialize-schema: always
 
-    ollama:
-      chat:
-        options:
-          model: 1473443474/tsukimi-yachiyo
-      embedding:
-        enabled: true
-        model: 1473443474/tsukimi-yachiyo
-      base-url: http://localhost:11434
+#    ollama:
+#      chat:
+#        options:
+#          model: tsukimi-yachiyo
+#      embedding:
+#        enabled: true
+#        model: tsukimi-yachiyo
+#      base-url: http://localhost:11434
     openai-sdk:
       api-key: ${openai.api-key}
       base-url: ${openai.base-url}
@@ -59,6 +64,8 @@ spring:
           model: qwen-plus
           temperature: 0.9
           top-p: 0.75
+      embedding:
+        model: text-embedding-v2
 custom:
   config:
     interval: "0 0 0/24 * * ? "

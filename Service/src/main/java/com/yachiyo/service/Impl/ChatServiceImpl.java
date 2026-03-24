@@ -1,23 +1,37 @@
 package com.yachiyo.service.Impl;
 
+import com.yachiyo.Config.AIConfig;
+import com.yachiyo.Config.ChatConfig;
 import com.yachiyo.Config.ChatMemoryHistoryToolConfig;
 import com.yachiyo.Config.FastMethodConfig;
 import com.yachiyo.dto.ChangeConversationTitleRequest;
 import com.yachiyo.dto.ChatRequest;
+import com.yachiyo.entity.Message;
 import com.yachiyo.entity.User;
 import com.yachiyo.mapper.ConversationMapper;
+import com.yachiyo.mapper.UserMapper;
 import com.yachiyo.result.Result;
 import com.yachiyo.service.ChatService;
 import jakarta.annotation.Resource;
+import lombok.Data;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -31,16 +45,20 @@ public class ChatServiceImpl implements ChatService {
     private ChatClient chatClient;
 
     @Autowired
+    private ChatConfig chatConfig;
+
+    @Autowired
     private ChatMemoryHistoryToolConfig chatMemoryHistoryToolConfig;
 
     @Autowired
     private FastMethodConfig fastMethodConfig;
 
     @Autowired
-    private Advisor retrievalAugmentationAdvisor;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private ChatMemory chatMemory;
+
 
     @Override
     public Result<String> Chat(ChatRequest chatRequest) {
@@ -83,6 +101,15 @@ public class ChatServiceImpl implements ChatService {
             log.error("保存对话记忆失败", e);
             return null;
         }
+        if (chatMemory.get(conversationId).isEmpty()) {
+            List<String> systemMessage = chatConfig.getSystemMessage();
+            List<String> userMessage = chatConfig.getUserMessage();
+            // 添加预设对话
+            for(int i = 0; i < systemMessage.size(); i++) {
+                chatMemory.add(conversationId, new SystemMessage(systemMessage.get(i)));
+                chatMemory.add(conversationId, new UserMessage(userMessage.get(i)));
+            }
+        }
 
         String systemMessage = "";
         try {
@@ -110,10 +137,10 @@ public class ChatServiceImpl implements ChatService {
         SseEmitter emitter = new SseEmitter(0L);
 
         String finalSystemMessage = systemMessage.isEmpty() ? "无特殊事件" : systemMessage;
+        try{
+            CompletableFuture.runAsync(() -> {try {
 
-        CompletableFuture.runAsync(() -> {try {
-
-            chatClient.prompt()
+                chatClient.prompt()
                     .user(message)
                     .system(finalSystemMessage)
                     .advisors(advisor -> advisor.param(CONVERSATION_ID, conversationId))
@@ -153,7 +180,11 @@ public class ChatServiceImpl implements ChatService {
                     emitter.completeWithError(e);
                     log.error("流式聊天失败", e);
                 }
-        });
+            });
+        } catch (Exception e) {
+            emitter.completeWithError(e);
+            log.error("流式聊天失败", e);
+        }
         return emitter;
     }
 
@@ -169,3 +200,6 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 }
+
+
+
