@@ -12,7 +12,7 @@ public interface PostingService {
     /**
      * 搜索帖子
      */
-    Result<List<Long>> searchPosting(String keyword);
+    Result<List<Long>> searchPosting(String keyword, Integer pageNum, Integer pageSize);
 
     /**
      * 点赞的帖子

@@ -24,8 +24,8 @@ public class PostingSearchController {
      * 搜索帖子
      */
     @PostMapping("/search")
-    public Result<List<Long>> searchPosting(@RequestParam String keyword) {
-        return postingService.searchPosting(keyword);
+    public Result<List<Long>> searchPosting(@RequestParam String keyword, @RequestParam Integer pageNum, @RequestParam Integer pageSize) {
+        return postingService.searchPosting(keyword, pageNum, pageSize);
     }
 
     /**

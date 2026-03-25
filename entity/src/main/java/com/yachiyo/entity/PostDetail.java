@@ -13,4 +13,6 @@ public class PostDetail {
     private Long collection;
 
     private Long reading;
+
+    private Long coin;
 }

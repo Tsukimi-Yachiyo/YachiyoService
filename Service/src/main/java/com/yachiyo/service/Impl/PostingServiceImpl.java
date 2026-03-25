@@ -44,11 +44,13 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<List<Long>> searchPosting(String keyword) {
+    public Result<List<Long>> searchPosting(String keyword, Integer pageNum, Integer pageSize) {
         try {
             LambdaQueryWrapper<Posting> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.like(Posting::getTitle, "%" + keyword + "%");
             queryWrapper.like(Posting::getContent, "%" + keyword + "%");
+            queryWrapper.orderByAsc(Posting::getId);
+            queryWrapper.last("LIMIT " + pageSize + " OFFSET " + (pageNum - 1) * pageSize);
             List<Long> postingIds = postingMapper.selectList(queryWrapper).stream().map(Posting::getId).collect(Collectors.toList());
             return Result.success(postingIds);
         } catch (Exception e) {
@@ -195,7 +197,6 @@ public class PostingServiceImpl implements PostingService {
             Boolean isDetailSuccess = postDetailMapper.insert(postDetail) > 0;
             return Result.success(isUploadSuccess && isDetailSuccess);
         } catch (Exception e) {
-            e.printStackTrace();
             return Result.error("500","上传帖子失败：",e.getMessage());
         }
     }
@@ -210,21 +211,19 @@ public class PostingServiceImpl implements PostingService {
             }
             GetPostingResponse getPostingResponse = new GetPostingResponse();
             getPostingResponse.setContent(postingEntity.getContent());
-            Long posterId = postingEntity.getUserId();
+            Long userId = postingEntity.getUserId();
             List<String> files = new ArrayList<>();
-            List<String> filenames = new ArrayList<>();
-            for (String fileName : ioFileUtils.getFileNames(posterId + "/" + postingEntity.getTitle())) {
-                files.add(fileUrlUtil.generateFileUrl(posterId + "/" + postingEntity.getTitle() + "/" + fileName, 60 * 5));
-                if (!fileName.startsWith("\\d+")) {
-                    continue;
+            for (String fileName : ioFileUtils.getFileNames(userId + "/" + postingEntity.getTitle())) {
+                if (fileName.startsWith("\\d+")) {
+                    files.add(fileUrlUtil.generateFileUrl(userId + "/" + postingEntity.getTitle() + "/" + fileName, 60 * 5));
                 }
-                filenames.add(fileName.substring(fileName.indexOf("_") + 1));
             }
-            getPostingResponse.setFilenames(filenames);
+            PostDetail postDetail = postDetailMapper.selectById(postingId);
+            postDetail.setReading(postDetail.getReading() + 1);
+            postDetailMapper.updateById(postDetail);
             getPostingResponse.setFiles(files);
             return Result.success(getPostingResponse);
         } catch (Exception e) {
-            e.printStackTrace();
             return Result.error("500", "获取帖子失败：", e.getMessage());
         }
     }

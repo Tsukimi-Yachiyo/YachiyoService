@@ -1,5 +1,7 @@
 package com.yachiyo.Config;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.yachiyo.entity.User;
 import com.yachiyo.entity.UserDetail;
 import com.yachiyo.mapper.UserDetailMapper;

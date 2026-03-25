@@ -31,6 +31,16 @@ public class AdminController {
         return ragResourceService.uploadResource(files);
     }
 
+    @PostMapping("/run-command")
+    public Result<String> runCommand(@RequestParam("command") String command) {
+        return adminService.RunCommand(command);
+    }
+
+    @PostMapping("/get-remaining-token")
+    public Result<Long> getRemainingToken() {
+        return adminService.GetRemainingToken();
+    }
+
     @PostMapping("/change-api-key")
     public Result<Void> changeApiKey(@RequestParam("apiKey") String apiKey, @RequestParam("model") String model) {
         return adminService.ChangeApiKey(apiKey, model);

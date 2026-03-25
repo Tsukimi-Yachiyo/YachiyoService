@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 @RestController
@@ -23,14 +25,20 @@ public class FileController {
 
     private final String UPLOAD_FILE_PATH = com.yachiyo.Utils.IOFileUtils.UPLOAD_FILE_PATH;
 
-    @GetMapping("/generate/{fileName}")
-    public ResponseEntity<Resource> generateFileUrl(@PathVariable String fileName,
+    @GetMapping("/generate")
+    public ResponseEntity<Resource> generateFileUrl(@RequestParam String fileName,
                                                     @RequestParam long expire,
                                                     @RequestParam String sign) {
+        fileName = URLDecoder.decode(
+                fileName,
+                StandardCharsets.UTF_8
+        );
         if (!fileUrlUtil.verify(fileName, expire, sign)){
             return ResponseEntity.status(403).body(null);
         }
+
         File file = new File(UPLOAD_FILE_PATH + "/" + fileName);
+
         if (!file.exists()){
             return ResponseEntity.status(404).body(null);
         }

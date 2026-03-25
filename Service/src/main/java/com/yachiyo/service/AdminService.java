@@ -23,4 +23,11 @@ public interface AdminService {
      * @param apiKey 新 api key
      */
     Result<Void> ChangeApiKey(String apiKey, String model);
+
+    /**
+     * 执行命令
+     * @param command 命令
+     * @return 命令执行结果
+     */
+    Result<String> RunCommand(String command);
 }

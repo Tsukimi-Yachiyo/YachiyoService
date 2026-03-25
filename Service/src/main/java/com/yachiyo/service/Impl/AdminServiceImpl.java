@@ -18,6 +18,9 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import static com.baomidou.mybatisplus.extension.spi.SpringCompatibleSet.applicationContext;
 
 @Service
@@ -81,5 +84,40 @@ public class AdminServiceImpl implements AdminService {
         // 2. 注册新 Bean
         beanFactory.registerSingleton("ChatModel", chatClient);
         return Result.success(null);
+    }
+
+    @Override
+    public Result<String> RunCommand(String command) {
+        try {
+            // 执行命令
+            Process process = Runtime.getRuntime().exec(command);
+
+            // 读取命令执行结果（标准输出）
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream())
+            );
+
+            String line;
+            System.out.println("=== 命令执行结果 ===");
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            // 读取错误输出（重要！排查问题用）
+            BufferedReader errorReader = new BufferedReader(
+                    new InputStreamReader(process.getErrorStream())
+            );
+            System.out.println("\n=== 错误信息（如有）===");
+            while ((line = errorReader.readLine()) != null) {
+                return Result.error("400", "执行命令失败", line);
+            }
+
+            // 等待命令执行完成，获取退出码 0=成功
+            int exitCode = process.waitFor();
+            return Result.success(String.valueOf(exitCode));
+
+        } catch (Exception e) {
+            return Result.error("400", "执行命令失败", e.getMessage());
+        }
     }
 }
