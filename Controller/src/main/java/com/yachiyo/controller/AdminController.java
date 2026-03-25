@@ -1,8 +1,11 @@
 package com.yachiyo.controller;
 
+import com.yachiyo.entity.User;
 import com.yachiyo.result.Result;
+import com.yachiyo.service.AdminService;
 import com.yachiyo.service.RAGResourceService;
 import jakarta.validation.Valid;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -20,8 +23,24 @@ public class AdminController {
     @Autowired
     private RAGResourceService ragResourceService;
 
+    @Autowired
+    private AdminService adminService;
+
     @PostMapping("/upload")
     public Result<Boolean> UploadResource(@RequestParam("files") List<MultipartFile> files) {
         return ragResourceService.uploadResource(files);
+    }
+
+    @PostMapping("/change-api-key")
+    public Result<Void> changeApiKey(@RequestParam("apiKey") String apiKey, @RequestParam("model") String model) {
+        return adminService.ChangeApiKey(apiKey, model);
+    }
+
+    @PostMapping("/login")
+    public Result<String> login(@RequestParam("username") String username, @RequestParam("password") String password) {
+        User user = new User();
+        user.setName(username);
+        user.setPassword(password);
+        return adminService.Login(user);
     }
 }

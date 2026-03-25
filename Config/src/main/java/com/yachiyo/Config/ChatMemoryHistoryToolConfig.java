@@ -82,6 +82,10 @@ public class ChatMemoryHistoryToolConfig {
                     else if (message.getType() == MessageType.ASSISTANT) {
                         yachiyo.add(message.getContent());}
                 }
+                while (user.size() != yachiyo.size()) {
+                    if (user.size() < yachiyo.size())
+                        yachiyo.removeLast();
+                    else user.removeLast();}
                 return user.stream().map(u -> new PromptResponse(u, yachiyo.get(user.indexOf(u)))).collect(Collectors.toList());
             }else {
                 throw new Exception("获取对话记忆失败");

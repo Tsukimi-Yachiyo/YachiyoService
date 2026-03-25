@@ -2,7 +2,6 @@ package com.yachiyo.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yachiyo.Config.FastMethodConfig;
-import com.yachiyo.Config.IOFileConfig;
 import com.yachiyo.Config.SecuritySafeToolConfig;
 import com.yachiyo.Utils.JwtUtils;
 import com.yachiyo.Utils.MailUtils;
@@ -47,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
     private MailUtils mailUtils;
 
     @Autowired
-    private IOFileConfig ioFileConfig;
+    private com.yachiyo.Utils.IOFileUtils ioFileUtils;
 
     @Override
     public Result<String> Login(LoginRequest loginRequest) {
@@ -117,8 +116,8 @@ public class AuthServiceImpl implements AuthService {
 
     private String userEntrySystem(User user) throws IOException {
         Long userId = user.getId();        //检查用户文件夹是否存在
-        if (ioFileConfig.checkDirExist(String.valueOf(userId))) {
-            ioFileConfig.createDir(String.valueOf(userId));
+        if (ioFileUtils.checkDirExist(String.valueOf(userId))) {
+            ioFileUtils.createDir(String.valueOf(userId));
         }
         String token = jwtUtils.generateToken(userId, user.getName(), securitySafeToolConfig.getUnique(userId));
         boolean isBirthday = fastMethodConfig.getBirthday(user);

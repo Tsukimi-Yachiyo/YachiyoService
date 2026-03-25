@@ -1,7 +1,8 @@
-package com.yachiyo.Config;
+package com.yachiyo.Utils;
 
+import lombok.Getter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -9,8 +10,8 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Configuration
-public class IOFileConfig {
+@Component
+public class IOFileUtils {
 
     /**
      * 运行时路径
@@ -20,11 +21,13 @@ public class IOFileConfig {
     /**
      * 上传文件路径
      */
+    @Getter
     public static final String UPLOAD_FILE_PATH = RUNTIME_FILE_PATH + "/src/main/resources/static/upload/";
 
     /**
      * 保存文件路径
      */
+    @Getter
     public static final String SAVE_FILE_PATH = RUNTIME_FILE_PATH + "/src/main/resources/static/save/";
 
     /**
@@ -34,8 +37,7 @@ public class IOFileConfig {
         try {
             fileBytes.transferTo(Paths.get(SAVE_FILE_PATH + fileName));
             return true;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException _) {
             return false;
         }
     }
@@ -46,10 +48,9 @@ public class IOFileConfig {
     public boolean uploadFile(String fileName, MultipartFile fileBytes) {
         try {
             fileBytes.transferTo(Paths.get(UPLOAD_FILE_PATH + fileName));
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
             return false;
+        } catch (IOException _) {
+            return true;
         }
     }
 
@@ -59,7 +60,7 @@ public class IOFileConfig {
     public byte[] readFile(String fileName) {
         try {
             return Files.readAllBytes(Paths.get(UPLOAD_FILE_PATH + fileName));
-        } catch (IOException e) {
+        } catch (IOException _) {
             return null;
         }
     }
@@ -67,18 +68,16 @@ public class IOFileConfig {
     /**
      * 删除文件
      */
-    public boolean deleteFile(String fileName) {
+    public void deleteFile(String fileName) {
         try {
             Files.delete(Paths.get(UPLOAD_FILE_PATH + fileName));
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+        } catch (IOException _) {
+
         }
     }
 
     /**
-     * 检查目录是否存在
+     * 检查文件是否存在
      */
     public boolean checkDirExist(String dirName) {
         return !Files.exists(Paths.get(UPLOAD_FILE_PATH + dirName));
@@ -108,13 +107,8 @@ public class IOFileConfig {
             }
             return fileNames.toArray(new String[0]);
         }catch (NoSuchFileException e){
-            e.printStackTrace();
             return new String[0];
         }
     }
 
-    @Bean
-    public IOFileConfig ioFileConfig() {
-        return new IOFileConfig();
-    }
 }

@@ -31,7 +31,7 @@ public interface UserService {
      * 获取用户头像
      * @return 用户头像
      */
-     Result<byte[]> getUserAvatar();
+     Result<String> getUserAvatar();
 
      /**
      * 获取某用户详情

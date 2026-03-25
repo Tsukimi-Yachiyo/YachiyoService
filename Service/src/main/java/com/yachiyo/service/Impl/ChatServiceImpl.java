@@ -59,21 +59,23 @@ public class ChatServiceImpl implements ChatService {
     @Autowired
     private ChatMemory chatMemory;
 
+    @Value("${chat.system}")
+    private String ChatPrompt;
+
 
     @Override
     public Result<String> Chat(ChatRequest chatRequest) {
-        String conversationId = chatRequest.getConversationId();
         String message = chatRequest.getMessage();
-        // 检查会话是否存在
-        try {
-            chatMemoryHistoryToolConfig.save(conversationId, message);
-        } catch (Exception e) {
-            log.error("保存对话记忆失败", e);
-            return Result.error("500", "保存对话记忆失败");
+
+        String systemPrompt = ChatCommon(chatRequest) ;
+        if (systemPrompt == null) {
+            systemPrompt = ChatPrompt;
         }
+
         String response = chatClient.prompt()
                 .user(message)
-                .advisors(advisor -> advisor.param(CONVERSATION_ID, Long.parseLong(conversationId)))
+                .system(systemPrompt)
+                .advisors(advisor -> advisor.param(CONVERSATION_ID, Long.parseLong(chatRequest.getConversationId())))
                 .call()
                 .content();
         return Result.success(response);
@@ -92,63 +94,29 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public SseEmitter StreamChat(ChatRequest chatRequest) {
-        String conversationId = chatRequest.getConversationId();
         String message = chatRequest.getMessage();
-        // 检查会话是否存在
-        try {
-            chatMemoryHistoryToolConfig.save(conversationId, message);
-        } catch (Exception e) {
-            log.error("保存对话记忆失败", e);
-            return null;
-        }
-        if (chatMemory.get(conversationId).isEmpty()) {
-            List<String> systemMessage = chatConfig.getSystemMessage();
-            List<String> userMessage = chatConfig.getUserMessage();
-            // 添加预设对话
-            for(int i = 0; i < systemMessage.size(); i++) {
-                chatMemory.add(conversationId, new SystemMessage(systemMessage.get(i)));
-                chatMemory.add(conversationId, new UserMessage(userMessage.get(i)));
-            }
-        }
 
-        String systemMessage = "";
-        try {
-            Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
-            boolean isBirthday = redisTemplate.opsForHash().get("user:" + userId, "birthday").equals("true");
-            if(isBirthday) {
-                systemMessage += "今天是用户的生日，";
-            }
-        } catch (Exception e) {
-            log.error("获取生日或节日失败", e);
-            return null;
-        }
-        // 从Redis中获取节日
-        try {
-            String holiday = fastMethodConfig.getHoliday();
-            if(!Objects.equals(holiday, null)) {
-                systemMessage += "今天是" + holiday + "，";
-            }
-        } catch (Exception e) {
-            log.error("获取节日失败", e);
-            return null;
+        String systemPrompt = ChatCommon(chatRequest) ;
+        if (systemPrompt == null) {
+            systemPrompt = ChatPrompt;
         }
 
         // 创建SseEmitter
         SseEmitter emitter = new SseEmitter(0L);
 
-        String finalSystemMessage = systemMessage.isEmpty() ? "无特殊事件" : systemMessage;
         try{
+            String finalSystemPrompt = systemPrompt;
             CompletableFuture.runAsync(() -> {try {
 
                 chatClient.prompt()
                     .user(message)
-                    .system(finalSystemMessage)
-                    .advisors(advisor -> advisor.param(CONVERSATION_ID, conversationId))
+                    .system(finalSystemPrompt)
+                    .advisors(advisor -> advisor.param(CONVERSATION_ID, Long.parseLong(chatRequest.getConversationId())))
                     .stream()
                     .content()
                     .doOnNext(response -> {
                         try {
-                            emitter.send(response);
+                            emitter.send(SseEmitter.event().data(response));
                         } catch (Exception e) {
                             emitter.completeWithError(e);
                             log.error("发送SSE事件失败", e);
@@ -156,7 +124,7 @@ public class ChatServiceImpl implements ChatService {
                     })
                     .doOnComplete(() -> {
                         try {
-                            emitter.send("[DONE]");
+                            emitter.send(SseEmitter.event().data("[DONE]"));
                             emitter.complete();
                         } catch (Exception e) {
                             emitter.completeWithError(e);
@@ -198,6 +166,51 @@ public class ChatServiceImpl implements ChatService {
             log.error("修改会话标题失败", e);
             return Result.error("500", "修改会话标题失败");
         }
+    }
+
+
+    private String ChatCommon(ChatRequest chatRequest) {
+        String conversationId = chatRequest.getConversationId();
+        String message = chatRequest.getMessage();
+        // 检查会话是否存在
+        try {
+            chatMemoryHistoryToolConfig.save(conversationId, message);
+        } catch (Exception e) {
+            log.error("保存对话记忆失败", e);
+            return null;
+        }
+        if (chatMemory.get(conversationId).isEmpty()) {
+            List<String> systemMessage = chatConfig.getSystemMessage();
+            List<String> userMessage = chatConfig.getUserMessage();
+            // 添加预设对话
+            for(int i = 0; i < systemMessage.size(); i++) {
+                chatMemory.add(conversationId, new SystemMessage(systemMessage.get(i)));
+                chatMemory.add(conversationId, new UserMessage(userMessage.get(i)));
+            }
+        }
+
+        try {
+            Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            boolean isBirthday = redisTemplate.opsForHash().get("user:" + userId, "birthday").equals("true");
+            if(isBirthday) {
+                ChatPrompt += "今天是用户的生日，";
+            }
+        } catch (Exception e) {
+            log.error("获取生日或节日失败", e);
+            return null;
+        }
+        // 从Redis中获取节日
+        try {
+            String holiday = fastMethodConfig.getHoliday();
+            if(!Objects.equals(holiday, null)) {
+                ChatPrompt += "今天是" + holiday + "，";
+            }
+        } catch (Exception e) {
+            log.error("获取节日失败", e);
+            return null;
+        }
+
+        return ChatPrompt;
     }
 }
 

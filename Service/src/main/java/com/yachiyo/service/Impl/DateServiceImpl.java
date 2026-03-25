@@ -37,7 +37,6 @@ public class DateServiceImpl implements DateService {
             }
             return "非节假日";
         } catch (Exception e) {
-            e.printStackTrace();
             return "获取节假日信息失败";
         }
     }

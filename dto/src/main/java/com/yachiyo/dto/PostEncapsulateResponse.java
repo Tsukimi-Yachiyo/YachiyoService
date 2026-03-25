@@ -9,5 +9,5 @@ public class PostEncapsulateResponse {
 
     private Long posterId;
 
-    private byte[] coverImage;
+    private String coverImage;
 }

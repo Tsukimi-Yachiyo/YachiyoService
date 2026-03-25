@@ -1,7 +1,7 @@
 package com.yachiyo.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.yachiyo.Config.IOFileConfig;
+import com.yachiyo.Utils.FileUrlUtil;
 import com.yachiyo.dto.PosterDetailResponse;
 import com.yachiyo.dto.UserDetailResponse;
 import com.yachiyo.entity.User;
@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.yachiyo.Utils.IOFileUtils;
 
 import java.util.Objects;
 
@@ -24,7 +25,10 @@ public class UserServiceImpl implements UserService {
     private UserDetailMapper userDetailMapper;
 
     @Autowired
-    private IOFileConfig ioFileConfig;
+    private FileUrlUtil fileUrlUtil;
+
+    @Autowired
+    private IOFileUtils ioFileUtils;
 
     @Override
     public Result<UserDetailResponse> getUserDetail() {
@@ -64,17 +68,17 @@ public class UserServiceImpl implements UserService {
     public Result<Boolean> updateUserAvatar(MultipartFile userAvatar) {
         // 从安全上下文获取当前用户id
         Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
-        if (!ioFileConfig.uploadFile(userId + "/avatar.jpg", userAvatar)) {
+        if (!ioFileUtils.uploadFile(userId + "/avatar.jpg", userAvatar)) {
             return Result.error("500", "上传用户头像失败");
         }
         return Result.success(true);
     }
 
-    @Override
-    public Result<byte[]> getUserAvatar() {
+     @Override
+    public Result<String> getUserAvatar() {
         // 从安全上下文获取当前用户id
         Long userId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
-        byte[] avatar = ioFileConfig.readFile(userId + "/avatar.jpg");
+        String avatar = fileUrlUtil.generateFileUrl(userId + "/avatar.jpg", 60 * 5);
         if (avatar == null) {
             return Result.error("404", "用户头像不存在");
         }
@@ -91,14 +95,12 @@ public class UserServiceImpl implements UserService {
             }
             PosterDetailResponse posterDetailResponse = new PosterDetailResponse();
             posterDetailResponse.setUserName(userDetail.getUserName());
-            posterDetailResponse.setUserAvatar(ioFileConfig.readFile(userId + "/avatar.jpg"));
+            posterDetailResponse.setUserAvatar(fileUrlUtil.generateFileUrl(userId + "/avatar.jpg", 60 * 5));
             return Result.success(posterDetailResponse);
         } catch (Exception e) {
                 return Result.error("500", "获取用户详情失败");
         }
     }
-
-
 
     /**
      * 从UserDetailResponse获取UserDetail

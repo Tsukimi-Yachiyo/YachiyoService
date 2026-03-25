@@ -35,7 +35,7 @@ public class UserDetailController {
      * @return 用户头像
      */
      @PostMapping("/avatar/get")
-    public Result<byte[]> getUserAvatar() {
+    public Result<String> getUserAvatar() {
         return userService.getUserAvatar();
     }
 

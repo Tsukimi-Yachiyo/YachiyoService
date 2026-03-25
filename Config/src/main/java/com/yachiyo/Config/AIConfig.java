@@ -12,6 +12,8 @@ import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openaisdk.OpenAiSdkChatModel;
+import org.springframework.ai.openaisdk.OpenAiSdkEmbeddingModel;
+import org.springframework.ai.openaisdk.OpenAiSdkEmbeddingOptions;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -40,16 +42,15 @@ public class AIConfig {
     @Value("${live2D.system}")
     private String SystemPrompt;
 
-    @Value("${chat.system}")
-    private String ChatPrompt;
-
     @Bean
     public ChatMemory chatMemory(ChatMemoryRepository chatMemoryRepository){
         return  MessageWindowChatMemory.builder()
                 .chatMemoryRepository(chatMemoryRepository)
-                .maxMessages(20)
+                .maxMessages(3)
                 .build();
     }
+
+
 
 //    @Bean("ChatModel")
 //    public ChatClient chatClient(ChatMemory chatMemory, Advisor retrievalAugmentationAdvisor) {
@@ -64,8 +65,8 @@ public class AIConfig {
 
     @Bean("ChatModel")
     public ChatClient chatClient(ChatMemory chatMemory, Advisor retrievalAugmentationAdvisor) {
+
         return ChatClient.builder(openAiSdkChatModel)
-                .defaultSystem(ChatPrompt)
                 .defaultAdvisors(
                         new SimpleLoggerAdvisor(),
                         MessageChatMemoryAdvisor.builder(chatMemory).build(),
@@ -73,7 +74,6 @@ public class AIConfig {
                 )
                 .build();
     }
-
 
     @Bean("Live2dModel")
     public ChatClient openAiChatClient() {

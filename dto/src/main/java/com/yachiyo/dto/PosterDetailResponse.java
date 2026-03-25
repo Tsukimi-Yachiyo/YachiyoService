@@ -7,5 +7,5 @@ public class PosterDetailResponse {
 
     public String userName;
 
-    public byte[] userAvatar;
+    public String userAvatar;
 }

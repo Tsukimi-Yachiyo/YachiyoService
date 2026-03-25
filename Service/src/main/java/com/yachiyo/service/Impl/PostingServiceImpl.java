@@ -2,8 +2,7 @@ package com.yachiyo.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.yachiyo.Config.IOFileConfig;
+import com.yachiyo.Utils.FileUrlUtil;
 import com.yachiyo.dto.GetPostingResponse;
 import com.yachiyo.dto.PostEncapsulateResponse;
 import com.yachiyo.dto.UploadPostingRequest;
@@ -11,6 +10,7 @@ import com.yachiyo.entity.*;
 import com.yachiyo.mapper.*;
 import com.yachiyo.result.Result;
 import com.yachiyo.service.PostingService;
+import com.yachiyo.Utils.IOFileUtils;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,15 +30,17 @@ public class PostingServiceImpl implements PostingService {
     private final PostDetailMapper postDetailMapper;
     private final LinkLikeMapper linkLikeMapper;
     private final LinkCollectionMapper linkCollectionMapper;
-    private final IOFileConfig ioFileConfig;
+    private final IOFileUtils ioFileUtils;
+    private final FileUrlUtil fileUrlUtil;
 
     @Autowired
-    public PostingServiceImpl(PostingMapper postingMapper, PostDetailMapper postDetailMapper, LinkLikeMapper linkLikeMapper, LinkCollectionMapper linkCollectionMapper, IOFileConfig ioFileConfig) {
+    public PostingServiceImpl(PostingMapper postingMapper, PostDetailMapper postDetailMapper, LinkLikeMapper linkLikeMapper, LinkCollectionMapper linkCollectionMapper, com.yachiyo.Utils.IOFileUtils ioFileUtils, FileUrlUtil fileUrlUtil) {
         this.postingMapper = postingMapper;
         this.postDetailMapper = postDetailMapper;
         this.linkLikeMapper = linkLikeMapper;
         this.linkCollectionMapper = linkCollectionMapper;
-        this.ioFileConfig = ioFileConfig;
+        this.ioFileUtils = ioFileUtils;
+        this.fileUrlUtil = fileUrlUtil;
     }
 
     @Override
@@ -167,16 +169,16 @@ public class PostingServiceImpl implements PostingService {
     public Result<Boolean> uploadPosting(UploadPostingRequest posting) {
         try {
             Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
-            if (ioFileConfig.checkDirExist(UserId + "/" + posting.getTitle())) {
-                ioFileConfig.createDir(UserId + "/" + posting.getTitle());
+            if (ioFileUtils.checkDirExist(UserId + "/" + posting.getTitle())) {
+                ioFileUtils.createDir(UserId + "/" + posting.getTitle());
             }
-            if (!ioFileConfig.uploadFile(UserId + "/" + posting.getTitle() + "/" + "cover.jpg", posting.getCoverImage())) {
+            if (ioFileUtils.uploadFile(UserId + "/" + posting.getTitle() + "/" + "cover.jpg", posting.getCoverImage())) {
                 return Result.error("封面图片上传失败");
             }
             if (posting.getFiles() != null && !posting.getFiles().isEmpty()) {
                 for (int i = 0; i < posting.getFiles().size(); i++) {
                     MultipartFile file = posting.getFiles().get(i);
-                    if (!ioFileConfig.uploadFile(UserId + "/" + posting.getTitle() + "/" + i + "_" + file.getOriginalFilename(), file)) {
+                    if (ioFileUtils.uploadFile(UserId + "/" + posting.getTitle() + "/" + i + "_" + file.getOriginalFilename(), file)) {
                         return Result.error("文件上传失败");
                     }
                 }
@@ -209,11 +211,11 @@ public class PostingServiceImpl implements PostingService {
             GetPostingResponse getPostingResponse = new GetPostingResponse();
             getPostingResponse.setContent(postingEntity.getContent());
             Long posterId = postingEntity.getUserId();
-            List<byte[]> files = new ArrayList<>();
+            List<String> files = new ArrayList<>();
             List<String> filenames = new ArrayList<>();
-            for (String fileName : ioFileConfig.getFileNames(posterId + "/" + postingEntity.getTitle())) {
-                files.add(ioFileConfig.readFile(posterId + "/" + postingEntity.getTitle() + "/" + fileName));
-                if (fileName.startsWith("cover.jpg")) {
+            for (String fileName : ioFileUtils.getFileNames(posterId + "/" + postingEntity.getTitle())) {
+                files.add(fileUrlUtil.generateFileUrl(posterId + "/" + postingEntity.getTitle() + "/" + fileName, 60 * 5));
+                if (!fileName.startsWith("\\d+")) {
                     continue;
                 }
                 filenames.add(fileName.substring(fileName.indexOf("_") + 1));
@@ -237,7 +239,7 @@ public class PostingServiceImpl implements PostingService {
             PostEncapsulateResponse postEncapsulateResponse = new PostEncapsulateResponse();
             postEncapsulateResponse.setTitle(postingEntity.getTitle());
             postEncapsulateResponse.setPosterId(postingEntity.getUserId());
-            postEncapsulateResponse.setCoverImage(ioFileConfig.readFile(postingEntity.getUserId() + "/" + postingEntity.getTitle() + "/" + "cover.jpg"));
+            postEncapsulateResponse.setCoverImage(fileUrlUtil.generateFileUrl(postingEntity.getUserId() + "/" + postingEntity.getTitle() + "/" + "cover.jpg", 60 * 5));
             return Result.success(postEncapsulateResponse);
         } catch (Exception e) {
             return Result.error("500","获取帖子简述失败：",e.getMessage());
@@ -270,7 +272,7 @@ public class PostingServiceImpl implements PostingService {
             if (postingEntity == null) {
                 return Result.error("帖子不存在");
             }
-            ioFileConfig.deleteFile(UserId + "/" + postingEntity.getTitle());
+            ioFileUtils.deleteFile(UserId + "/" + postingEntity.getTitle());
             return Result.success(
                     postingMapper.deleteById(postingId) > 0);
         } catch (Exception e) {

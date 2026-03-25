@@ -11,5 +11,5 @@ public class GetPostingResponse {
 
     private List<String> filenames;
 
-    private List<byte[]> files;
+    private List<String> files;
 }
