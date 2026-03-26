@@ -13,7 +13,7 @@ public interface AuthService {
      * @return 登录结果
      */
     @Schema(description = "登录请求")
-    public Result<String> Login(LoginRequest loginRequest);
+    Result<String> Login(LoginRequest loginRequest);
 
     /**
      * 注册
@@ -21,7 +21,7 @@ public interface AuthService {
      * @return 注册结果
      */
     @Schema(description = "注册请求")
-    public Result<String> Register(RegisterRequest registerRequest);
+    Result<String> Register(RegisterRequest registerRequest);
 
     /**
      * 发送验证码
@@ -29,5 +29,5 @@ public interface AuthService {
      * @return 发送结果
      */
     @Schema(description = "发送验证码请求")
-    public Result<Boolean> SendCode(String email);
+    Result<Boolean> SendCode(String email);
 }

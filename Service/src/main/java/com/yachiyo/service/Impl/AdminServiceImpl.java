@@ -36,7 +36,7 @@ public class AdminServiceImpl implements AdminService {
     public Result<String> Login(User user) {
         if (user.getName().equals("admin")) {
             if (user.getPassword().equals(securitySafeToolConfig.md5("123456"))) {
-                return Result.success(jwtUtils.generateToken(0L, "admin", String.valueOf(securitySafeToolConfig.getStatusSafeCode())));
+                return Result.success(jwtUtils.generateToken(0L, "admin", String.valueOf(SecuritySafeToolConfig.getStatusSafeCode())));
             }
         }
         return Result.error("400", "登录失败", "登录失败");

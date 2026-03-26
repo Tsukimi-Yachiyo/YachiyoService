@@ -14,14 +14,14 @@ public interface ChatService {
      * @return 回复
      */
     @Schema(description = "聊天请求")
-    public Result<String> Chat(ChatRequest chatRequest);
+    Result<String> Chat(ChatRequest chatRequest);
 
      /**
      * 创建会话
      * @return 会话ID
      */
     @Schema(description = "创建会话")
-    public Result<String> Create();
+    Result<String> Create();
 
 
     /**
@@ -30,7 +30,7 @@ public interface ChatService {
      * @return 回复
      */
      @Schema(description = "流式聊天")
-    public SseEmitter StreamChat(ChatRequest chatRequest);
+     SseEmitter StreamChat(ChatRequest chatRequest);
 
      /**
      * 修改会话标题
@@ -38,5 +38,5 @@ public interface ChatService {
      * @return 修改结果
      */
     @Schema(description = "修改会话标题")
-    public Result<Boolean> ChangeConversationTitle(ChangeConversationTitleRequest changeConversationTitleRequest);
+    Result<Boolean> ChangeConversationTitle(ChangeConversationTitleRequest changeConversationTitleRequest);
 }

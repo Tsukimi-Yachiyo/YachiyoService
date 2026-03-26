@@ -10,11 +10,11 @@ public interface CoinChangeService {
      * @param request 修改金币请求
      * @return 修改结果
      */
-    public Result<Boolean> changeCoin(CoinChangeRequest request);
+    Result<Boolean> changeCoin(CoinChangeRequest request);
 
     /**
      * 获取金币
      * @return 金币
      */
-    public Result<Integer> getCoin();
+    Result<Integer> getCoin();
 }

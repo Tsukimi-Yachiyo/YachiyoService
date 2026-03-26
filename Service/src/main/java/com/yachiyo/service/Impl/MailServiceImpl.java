@@ -28,9 +28,6 @@ public class MailServiceImpl implements MailService {
     private MailMapper mailMapper;
 
     @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
     private FileUrlUtil fileUrlUtil;
     @Autowired
     private UserDetailMapper userDetailMapper;
