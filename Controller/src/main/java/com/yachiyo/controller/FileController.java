@@ -4,6 +4,7 @@ package com.yachiyo.controller;
 import com.yachiyo.Utils.FileUrlUtil;
 import com.yachiyo.result.Result;
 import lombok.RequiredArgsConstructor;
+import org.apache.tika.metadata.HttpHeaders;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -52,6 +53,8 @@ public class FileController {
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION,"attachment; filename=\"" + fileName + "\"")
+                .header("Access-Control-Expose-Headers", "Content-Disposition")
                 .body(new FileSystemResource(file));
     }
 }

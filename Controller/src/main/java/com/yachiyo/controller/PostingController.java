@@ -89,6 +89,22 @@ public class PostingController {
     }
 
     /**
+     * 获取帖子的阅读数
+     */
+    @PostMapping("/getReadingCount")
+    public Result<Long> getReadingCount(@RequestParam Long postingId) {
+        return postingService.getReadingCount(postingId);
+    }
+
+    /**
+     * 获取帖子的金币数
+     */
+    @PostMapping("/getCoinCount")
+    public Result<Long> getCoinCount(@RequestParam Long postingId) {
+        return postingService.getCoinCount(postingId);
+    }
+
+    /**
      * 判断是否点赞帖子
      */
     @PostMapping("/isLiked")

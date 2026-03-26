@@ -80,6 +80,16 @@ public interface PostingService {
     Result<Boolean> isCollected(Long postingId);
 
     /**
+     * 获取帖子的阅读数
+     */
+    Result<Long> getReadingCount(Long postingId);
+
+    /**
+     * 获取帖子的金币数
+     */
+    Result<Long> getCoinCount(Long postingId);
+
+    /**
      * 删除帖子
      */
     Result<Boolean> deletePosting(Long postingId);

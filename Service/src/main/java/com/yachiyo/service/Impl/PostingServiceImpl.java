@@ -174,7 +174,7 @@ public class PostingServiceImpl implements PostingService {
             if (ioFileUtils.checkDirExist(UserId + "/" + posting.getTitle())) {
                 ioFileUtils.createDir(UserId + "/" + posting.getTitle());
             }
-            if (ioFileUtils.uploadFile(UserId + "/" + posting.getTitle() + "/" + "cover.jpg", posting.getCoverImage())) {
+            if (!ioFileUtils.uploadFile(UserId + "/" + posting.getTitle() + "/" + "cover.jpg", posting.getCoverImage())) {
                 return Result.error("封面图片上传失败");
             }
             if (posting.getFiles() != null && !posting.getFiles().isEmpty()) {
@@ -260,6 +260,24 @@ public class PostingServiceImpl implements PostingService {
                 return Result.success(postDetailMapper.selectById(postingId).getLove());
         } catch (Exception e) {
             return Result.error("500","获取帖子点赞数失败：",e.getMessage());
+        }
+    }
+
+    @Override
+    public Result<Long> getReadingCount(Long postingId) {
+        try {
+                return Result.success(postDetailMapper.selectById(postingId).getReading());
+        } catch (Exception e) {
+            return Result.error("500","获取帖子阅读数失败：",e.getMessage());
+        }
+    }
+
+    @Override
+    public Result<Long> getCoinCount(Long postingId) {
+        try {
+                return Result.success(postDetailMapper.selectById(postingId).getCoin());
+        } catch (Exception e) {
+            return Result.error("500","获取帖子金币数失败：",e.getMessage());
         }
     }
 

@@ -1,6 +1,8 @@
 package com.yachiyo.Utils;
 
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,7 +12,7 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Component @Slf4j
 public class IOFileUtils {
 
     /**
@@ -37,7 +39,8 @@ public class IOFileUtils {
         try {
             fileBytes.transferTo(Paths.get(SAVE_FILE_PATH + fileName));
             return true;
-        } catch (IOException _) {
+        } catch (IOException e) {
+            log.error("保存文件失败",e);
             return false;
         }
     }
@@ -45,12 +48,13 @@ public class IOFileUtils {
     /**
      * 上传文件
      */
-    public boolean uploadFile(String fileName, MultipartFile fileBytes) {
+    public boolean uploadFile(@NonNull String fileName, @NonNull MultipartFile fileBytes) {
         try {
             fileBytes.transferTo(Paths.get(UPLOAD_FILE_PATH + fileName));
-            return false;
-        } catch (IOException _) {
             return true;
+        } catch (IOException e) {
+            log.error("上传文件失败",e);
+            return false;
         }
     }
 
@@ -60,7 +64,8 @@ public class IOFileUtils {
     public byte[] readFile(String fileName) {
         try {
             return Files.readAllBytes(Paths.get(UPLOAD_FILE_PATH + fileName));
-        } catch (IOException _) {
+        } catch (IOException e) {
+            log.error("读取文件失败",e);
             return null;
         }
     }
@@ -71,8 +76,8 @@ public class IOFileUtils {
     public void deleteFile(String fileName) {
         try {
             Files.delete(Paths.get(UPLOAD_FILE_PATH + fileName));
-        } catch (IOException _) {
-
+        } catch (IOException e) {
+            log.error("删除文件失败",e);
         }
     }
 

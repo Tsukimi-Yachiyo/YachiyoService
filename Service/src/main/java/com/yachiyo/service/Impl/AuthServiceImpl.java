@@ -3,6 +3,7 @@ package com.yachiyo.service.Impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yachiyo.Config.FastMethodConfig;
 import com.yachiyo.Config.SecuritySafeToolConfig;
+import com.yachiyo.Utils.IOFileUtils;
 import com.yachiyo.Utils.JwtUtils;
 import com.yachiyo.Utils.MailUtils;
 import com.yachiyo.dto.LoginRequest;
@@ -46,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
     private MailUtils mailUtils;
 
     @Autowired
-    private com.yachiyo.Utils.IOFileUtils ioFileUtils;
+    private IOFileUtils ioFileUtils;
 
     @Override
     public Result<String> Login(LoginRequest loginRequest) {

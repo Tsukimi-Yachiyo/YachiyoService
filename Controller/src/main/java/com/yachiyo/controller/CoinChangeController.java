@@ -21,9 +21,9 @@ public class CoinChangeController {
     private final CoinChangeService coinChangeService;
 
     /**
-     * 充值
-     * @param coinChangeRequest 充值请求
-     * @return 充值结果
+     * 金币交易
+     * @param coinChangeRequest 金币交易请求
+     * @return 金币交易结果
      */
     @PostMapping("/change")
     public Result<Boolean> changeCoin(@RequestBody @Valid CoinChangeRequest coinChangeRequest) {

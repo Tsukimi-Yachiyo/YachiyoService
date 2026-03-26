@@ -1,14 +1,15 @@
 package com.yachiyo.filter;
 
 import cn.hutool.core.text.AntPathMatcher;
+import com.yachiyo.Config.SecuritySafeToolConfig;
 import com.yachiyo.entity.User;
-import com.yachiyo.Config.FastMethodConfig;
 import com.yachiyo.Utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -33,11 +34,14 @@ public class JwtFilter extends OncePerRequestFilter {
     @Value("${security.open-api}")
     private String[] openApi;
 
+    @Autowired
+    private SecuritySafeToolConfig securitySafeToolConfig;
+
     // 在类中添加路径匹配器
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws IOException {
         try {
             String jwt = getJwtFromRequest(request);
             if (jwt != null && jwtUtils.isTokenValid(jwt)) {
@@ -46,7 +50,17 @@ public class JwtFilter extends OncePerRequestFilter {
                 String username = jwtUtils.getNameFromToken(jwt);
                 User user = new User(Long.parseLong(userId), username, null, null, null);
                 List<GrantedAuthority> authorities = new ArrayList<>();
-                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+
+                if (!securitySafeToolConfig.checkUnique(Integer.parseInt(userId), jwtUtils.getUniqueCodeFromToken(jwt))) {
+                    sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "实时唯一码错误");
+                    return;
+                }
+
+                if (user.getId() == 0L) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                }else if (user.getRole() == null) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                }
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
