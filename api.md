@@ -834,7 +834,7 @@ Authorization: Bearer <your_jwt_token>
 |------|------|------|------|
 | postingId | Long | 是 | 帖子 ID |
 
-**响应体** (`Result<Long>`):
+**响应体** (`Result<List<Long>>`):
 
 ```json
 {
@@ -934,7 +934,7 @@ Authorization: Bearer <your_jwt_token>
 {
   "code": "200",
   "message": "success",
-  "data": 123,
+  "data": [123, 456],
   "detail": null
 }
 ```
