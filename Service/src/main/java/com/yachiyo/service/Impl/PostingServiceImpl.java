@@ -51,6 +51,7 @@ public class PostingServiceImpl implements PostingService {
             queryWrapper.like(Posting::getContent, "%" + keyword + "%");
             queryWrapper.orderByAsc(Posting::getId);
             queryWrapper.last("LIMIT " + pageSize + " OFFSET " + (pageNum - 1) * pageSize);
+            queryWrapper.eq(Posting::getIsApproved, true);
             List<Long> postingIds = postingMapper.selectList(queryWrapper).stream().map(Posting::getId).collect(Collectors.toList());
             return Result.success(postingIds);
         } catch (Exception e) {
