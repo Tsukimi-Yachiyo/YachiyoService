@@ -176,10 +176,31 @@ public class AdminServiceImpl implements AdminService {
     public Result<List<Posting>> GetUnapprovedPosting() {
         try {
             List<Posting> postings = postingMapper.selectList(new LambdaQueryWrapper<Posting>()
-                    .eq(Posting::getIsApproved, false));
+                    .eq(Posting::getIsApproved, null));
             return Result.success(postings);
         } catch (Exception e) {
             return Result.error("400", "获取未审核帖子失败", e.getMessage());
+        }
+    }
+
+    @Override
+    public Result<Boolean> DeletePosting(Long postingId) {
+        try {
+            postingMapper.deleteById(postingId);
+            return Result.success(true);
+        } catch (Exception e) {
+            return Result.error("400", "删除帖子失败", e.getMessage());
+        }
+    }
+
+    @Override
+    public Result<List<Posting>> GetRejectedPosting() {
+        try {
+            List<Posting> postings = postingMapper.selectList(new LambdaQueryWrapper<Posting>()
+                    .eq(Posting::getIsApproved, false));
+            return Result.success(postings);
+        } catch (Exception e) {
+            return Result.error("400", "获取拒绝帖子失败", e.getMessage());
         }
     }
 }

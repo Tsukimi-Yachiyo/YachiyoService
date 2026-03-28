@@ -2,6 +2,7 @@ package com.yachiyo.service;
 
 import com.yachiyo.dto.GetPostingResponse;
 import com.yachiyo.dto.PostEncapsulateResponse;
+import com.yachiyo.dto.SelfPostResponse;
 import com.yachiyo.dto.UploadPostingRequest;
 import com.yachiyo.result.Result;
 
@@ -97,5 +98,5 @@ public interface PostingService {
     /**
      * 获取自己的帖子
      */
-    Result<List<Long>> getMyPosting();
+    Result<List<SelfPostResponse>> getMyPosting();
 }

@@ -56,7 +56,6 @@ public interface AdminService {
      * 获取所有帖子
      *
      * @return 所有帖子
-     * @throws Exception 异常
      */
     Result<List<Posting>> GetAllPosting();
 
@@ -64,7 +63,20 @@ public interface AdminService {
      * 获取未审核帖子
      *
      * @return 未审核帖子
-     * @throws Exception 异常
      */
     Result<List<Posting>> GetUnapprovedPosting();
+
+    /**
+     * 删除帖子
+     *
+     * @param postingId 帖子 id
+     */
+    Result<Boolean> DeletePosting(Long postingId);
+
+    /**
+     * 获取拒绝帖子
+     *
+     * @return 拒绝帖子
+     */
+    Result<List<Posting>> GetRejectedPosting();
 }

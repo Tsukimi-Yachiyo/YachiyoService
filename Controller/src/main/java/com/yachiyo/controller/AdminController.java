@@ -74,4 +74,14 @@ public class AdminController {
     public Result<List<Posting>> getUnapprovedPosting() {
         return adminService.GetUnapprovedPosting();
     }
+
+    @PostMapping("/delete-posting")
+    public Result<Boolean> deletePosting(@RequestParam("postingId") Long postingId) {
+        return adminService.DeletePosting(postingId);
+    }
+
+    @PostMapping("/get-rejected-posting")
+    public Result<List<Posting>> getRejectedPosting() {
+        return adminService.GetRejectedPosting();
+    }
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.yachiyo.Utils.FileUrlUtil;
 import com.yachiyo.dto.GetPostingResponse;
 import com.yachiyo.dto.PostEncapsulateResponse;
+import com.yachiyo.dto.SelfPostResponse;
 import com.yachiyo.dto.UploadPostingRequest;
 import com.yachiyo.entity.*;
 import com.yachiyo.mapper.*;
@@ -210,6 +211,9 @@ public class PostingServiceImpl implements PostingService {
             if (postingEntity == null) {
                 return Result.error("帖子不存在");
             }
+            if (!postingEntity.getIsApproved()) {
+                return Result.error("帖子未审核");
+            }
             GetPostingResponse getPostingResponse = new GetPostingResponse();
             getPostingResponse.setContent(postingEntity.getContent());
             Long userId = postingEntity.getUserId();
@@ -235,6 +239,9 @@ public class PostingServiceImpl implements PostingService {
             Posting postingEntity = postingMapper.selectById(postingId);
             if (postingEntity == null) {
                 return Result.error("帖子不存在");
+            }
+            if (!postingEntity.getIsApproved()) {
+                return Result.error("帖子未审核");
             }
             PostEncapsulateResponse postEncapsulateResponse = new PostEncapsulateResponse();
             postEncapsulateResponse.setTitle(postingEntity.getTitle());
@@ -299,14 +306,21 @@ public class PostingServiceImpl implements PostingService {
     }
 
     @Override
-    public Result<List<Long>> getMyPosting() {
+    public Result<List<SelfPostResponse>> getMyPosting() {
         try {
             Long UserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
             List<Long> postingIds = postingMapper.selectList(new QueryWrapper<Posting>().eq("user_id", UserId).orderByDesc("id"))
                     .stream()
                     .map(Posting::getId)
                     .toList();
-            return Result.success(postingIds);
+            List<com.yachiyo.dto.SelfPostResponse> selfPostResponses = new ArrayList<>();
+            for (Long postingId : postingIds) {
+                SelfPostResponse selfPostResponse = new SelfPostResponse();
+                selfPostResponse.setPostingId(postingId);
+                selfPostResponse.setApproved(postingMapper.selectById(postingId).getIsApproved());
+                selfPostResponses.add(selfPostResponse);
+            }
+            return Result.success(selfPostResponses);
         } catch (Exception e) {
             return Result.error("500","获取自己的帖子失败：",e.getMessage());
         }

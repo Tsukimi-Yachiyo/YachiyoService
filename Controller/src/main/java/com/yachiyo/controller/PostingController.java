@@ -1,6 +1,7 @@
 package com.yachiyo.controller;
 
 import com.yachiyo.dto.GetPostingResponse;
+import com.yachiyo.dto.SelfPostResponse;
 import com.yachiyo.dto.UploadPostingRequest;
 import com.yachiyo.result.Result;
 import com.yachiyo.service.PostingService;
@@ -132,7 +133,7 @@ public class PostingController {
      * 获取自己的帖子
      */
     @PostMapping("/getMyPosting")
-    public Result<List<Long>> getMyPosting() {
+    public Result<List<SelfPostResponse>> getMyPosting() {
         return postingService.getMyPosting();
     }
 }

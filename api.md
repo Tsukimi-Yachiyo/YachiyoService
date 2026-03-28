@@ -1454,7 +1454,7 @@ Hello World!
 ### DTO 类
 
 #### LoginRequest
-```java
+```json5
 {
   "username": "String",  // 用户名或手机号
   "password": "String"   // 密码
@@ -1462,7 +1462,7 @@ Hello World!
 ```
 
 #### RegisterRequest
-```java
+```json5
 {
   "username": "String",  // 用户名
   "password": "String",  // 密码
@@ -1472,7 +1472,7 @@ Hello World!
 ```
 
 #### ChatRequest
-```java
+```json5
 {
   "message": "String",        // 消息内容
   "conversationId": "String"  // 会话 ID
@@ -1480,7 +1480,7 @@ Hello World!
 ```
 
 #### UploadPostingRequest
-```java
+```json
 {
   "title": "String",
   "content": "String",
@@ -1491,7 +1491,7 @@ Hello World!
 ```
 
 #### CommentRequest
-```java
+```json5
 {
   "postingId": "Long",
   "content": "String"
@@ -1499,7 +1499,7 @@ Hello World!
 ```
 
 #### UserDetailResponse
-```java
+```json5
 {
   "userName": "String",        // 用户名
   "userIntroduction": "String",// 个人简介
@@ -1511,7 +1511,7 @@ Hello World!
 ```
 
 #### ConversationResponse
-```java
+```json5
 {
   "id": "Long",
   "title": "String"
@@ -1519,7 +1519,7 @@ Hello World!
 ```
 
 #### PostEncapsulateResponse
-```java
+```json5
 {
   "title": "String",
   "posterId": "Long",
@@ -1528,7 +1528,7 @@ Hello World!
 ```
 
 #### GetPostingResponse
-```java
+```json5
 {
   "content": "String",
   "filenames": "List<String>",
@@ -1537,7 +1537,7 @@ Hello World!
 ```
 
 #### CommentResponse
-```java
+```json5
 {
   "id": "Long",
   "userId": "Long",
@@ -1547,7 +1547,7 @@ Hello World!
 ```
 
 #### PosterDetailResponse
-```java
+```json5
 {
   "userName": "String",
   "userAvatar": "String"
@@ -1555,7 +1555,7 @@ Hello World!
 ```
 
 #### PromptResponse
-```java
+```json5
 {
   "user": "String",
   "assistant": "String"
@@ -1565,7 +1565,7 @@ Hello World!
 ### 实体类
 
 #### User
-```java
+```json5
 {
   "id": "Long",         // 用户 ID
   "name": "String",     // 用户名
@@ -1576,7 +1576,7 @@ Hello World!
 ```
 
 #### UserDetail
-```java
+```json5
 {
   "userId": "Long",
   "userIntroduction": "String",
@@ -1588,7 +1588,7 @@ Hello World!
 ```
 
 #### Posting
-```java
+```json5
 {
   "id": "Long",
   "userId": "Long",
@@ -1599,7 +1599,7 @@ Hello World!
 ```
 
 #### PostDetail
-```java
+```json5
 {
   "id": "Long",
   "love": "Long",        // 点赞数
@@ -1609,7 +1609,7 @@ Hello World!
 ```
 
 #### Comment
-```java
+```json5
 {
   "id": "Long",
   "userId": "Long",
@@ -1619,7 +1619,7 @@ Hello World!
 ```
 
 #### Conversation
-```java
+```json5
 {
   "id": "Long",
   "userId": "Long",
@@ -1630,7 +1630,7 @@ Hello World!
 ```
 
 #### Message
-```java
+```json5
 {
   "id": "String",           // 会话 ID
   "content": "String",      // 消息内容
@@ -1640,7 +1640,7 @@ Hello World!
 ```
 
 #### LinkLike
-```java
+```json5
 {
   "userId": "Long",
   "postingId": "Long"
@@ -1648,7 +1648,7 @@ Hello World!
 ```
 
 #### LinkCollection
-```java
+```json
 {
   "userId": "Long",
   "postingId": "Long"
