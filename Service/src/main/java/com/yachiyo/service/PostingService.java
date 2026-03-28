@@ -28,21 +28,25 @@ public interface PostingService {
     /**
      * 点赞
      */
+    @Deprecated
     Result<Boolean> likePosting(Long postingId);
 
     /**
      * 收藏
      */
+    @Deprecated
     Result<Boolean> collectionPosting(Long postingId);
 
     /**
      * 取消点赞
      */
+    @Deprecated
     Result<Boolean> cancelLikePosting(Long postingId);
 
     /**
      * 取消收藏
      */
+    @Deprecated
     Result<Boolean> cancelCollectionPosting(Long postingId);
 
     /**
@@ -63,26 +67,31 @@ public interface PostingService {
     /**
      * 获取帖子的收藏数
      */
+    @Deprecated
     Result<Long> getCollectionCount(Long postingId);
 
     /**
      * 获取帖子的点赞数
      */
+    @Deprecated
     Result<Long> getLikeCount(Long postingId);
 
     /**
      * 判断是否点赞帖子
      */
+    @Deprecated
     Result<Boolean> isLiked(Long postingId);
 
     /**
      * 判断是否收藏帖子
      */
+    @Deprecated
     Result<Boolean> isCollected(Long postingId);
 
     /**
      * 获取帖子的阅读数
      */
+    @Deprecated
     Result<Long> getReadingCount(Long postingId);
 
     /**
@@ -94,6 +103,20 @@ public interface PostingService {
      * 删除帖子
      */
     Result<Boolean> deletePosting(Long postingId);
+
+    /**
+     * 处理帖子互动（点赞/收藏）
+     * @param request 互动请求
+     * @return 操作结果
+     */
+    Result<Boolean> handleInteraction(com.yachiyo.dto.InteractionRequest request);
+
+    /**
+     * 获取帖子统计信息
+     * @param postingId 帖子ID
+     * @return 帖子统计信息
+     */
+    Result<com.yachiyo.dto.PostStatsResponse> getPostingStats(Long postingId);
 
     /**
      * 获取自己的帖子
