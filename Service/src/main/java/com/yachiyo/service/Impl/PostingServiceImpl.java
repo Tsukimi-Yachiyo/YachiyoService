@@ -240,7 +240,10 @@ public class PostingServiceImpl implements PostingService {
             if (postingEntity == null) {
                 return Result.error("帖子不存在");
             }
-            if (!postingEntity.getIsApproved()) {
+            // 获取当前登录用户
+            Long currentUserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+            // 如果不是帖子作者且帖子未审核，则拒绝访问
+            if (!postingEntity.getIsApproved() && !postingEntity.getUserId().equals(currentUserId)) {
                 return Result.error("帖子未审核");
             }
             PostEncapsulateResponse postEncapsulateResponse = new PostEncapsulateResponse();
