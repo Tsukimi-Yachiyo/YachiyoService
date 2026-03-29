@@ -1006,44 +1006,6 @@ Authorization: Bearer <your_jwt_token>
 
 ---
 
-#### 5.13 获取帖子审核状态
-
-**接口**: `POST /api/v2/posting/review-status`
-
-**认证**: ✅ 需要
-
-**请求参数**:
-
-| 参数 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| postingId | Long | 是 | 帖子 ID |
-
-**响应体** (`Result<PostingReviewStatusResponse>`):
-
-```json
-{
-  "code": "200",
-  "message": "success",
-  "data": {
-    "postingId": 123,
-    "status": "PENDING",
-    "rejectReason": null
-  },
-  "detail": null
-}
-```
-
-**状态说明**:
-- `PENDING`: 待审核 (isApproved = null)
-- `APPROVED`: 已通过 (isApproved = true)
-- `REJECTED`: 已拒绝 (isApproved = false)
-
-**注意事项**:
-- 只能查询自己发布的帖子的审核状态
-- 拒绝原因字段目前为空，未来可扩展
-
----
-
 ### 6. 帖子搜索模块 (Posting Search)
 
 **基础路径**: `/api/v2/searching`
@@ -2238,15 +2200,6 @@ Hello World!
 }
 ```
 
-#### PostingReviewStatusResponse
-```json5
-{
-  "postingId": "Long",
-  "status": "String",      // 审核状态：PENDING（待审核）、APPROVED（已通过）、REJECTED（已拒绝）
-  "rejectReason": "String" // 拒绝原因（仅在状态为REJECTED时有效）
-}
-```
-
 #### ReviewRequest
 ```json5
 {
@@ -2478,17 +2431,9 @@ Hello World!
 ---
 
 **文档生成时间**: 2026-03-29
-**文档版本**: v1.5 (审核状态查询接口)
+**文档版本**: v1.4 (admin接口更新版)
 
 **更新日志**:
-
-### v1.5 (2026-03-29)
-- 新增帖子审核状态查询接口：`POST /api/v2/posting/review-status`
-  - 普通用户可查询自己帖子的详细审核状态（PENDING/APPROVED/REJECTED）
-  - 新增 `PostingReviewStatusResponse` DTO
-  - 接口路径：`/api/v2/posting/review-status`
-- 更新帖子模块文档，添加5.13章节
-- 更新数据模型，添加 `PostingReviewStatusResponse` DTO说明
 
 ### v1.4 (2026-03-29)
 - 根据 commit 93c141e 更新管理员接口

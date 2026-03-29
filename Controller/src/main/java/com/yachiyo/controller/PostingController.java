@@ -2,7 +2,6 @@ package com.yachiyo.controller;
 
 import com.yachiyo.dto.GetPostingResponse;
 import com.yachiyo.dto.InteractionRequest;
-import com.yachiyo.dto.PostingReviewStatusResponse;
 import com.yachiyo.dto.PostStatsResponse;
 import com.yachiyo.dto.SelfPostResponse;
 import com.yachiyo.dto.UploadPostingRequest;
@@ -75,13 +74,5 @@ public class PostingController {
     @PostMapping("/getMyPosting")
     public Result<List<SelfPostResponse>> getMyPosting() {
         return postingService.getMyPosting();
-    }
-
-    /**
-     * 获取帖子审核状态
-     */
-    @PostMapping("/review-status")
-    public Result<PostingReviewStatusResponse> getPostingReviewStatus(@RequestParam Long postingId) {
-        return postingService.getPostingReviewStatus(postingId);
     }
 }
