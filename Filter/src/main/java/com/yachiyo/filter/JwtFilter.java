@@ -55,6 +55,12 @@ public class JwtFilter extends OncePerRequestFilter {
                 user.setName(username);
                 List<GrantedAuthority> authorities = new ArrayList<>();
 
+                // 验证是否过期
+                if (jwtUtils.isTokenExpired(jwt)) {
+                    sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "令牌过期");
+                    return;
+                }
+
                 if (!securitySafeToolConfig.checkUnique(Integer.parseInt(userId), jwtUtils.getUniqueCodeFromToken(jwt))) {
                     sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "实时唯一码错误");
                     return;
@@ -65,8 +71,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 }else{
                     authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
                 }
-                String token = jwtUtils.generateToken(Long.valueOf(userId), user.getName(), securitySafeToolConfig.getUnique(Long.parseLong(userId)));
-                response.setHeader(jwtUtils.getTokenHeader(), token);
 
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
