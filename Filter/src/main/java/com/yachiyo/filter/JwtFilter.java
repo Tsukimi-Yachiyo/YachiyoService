@@ -65,8 +65,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 }else{
                     authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
                 }
-                String newToken = jwtUtils.updateToken(jwt, securitySafeToolConfig.getUnique(Long.parseLong(userId)));
-                response.setHeader(jwtUtils.getTokenHeader(), newToken);
+                String token = jwtUtils.generateToken(Long.valueOf(userId), user.getName(), securitySafeToolConfig.getUnique(Long.parseLong(userId)));
+                response.setHeader(jwtUtils.getTokenHeader(), token);
 
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -76,6 +76,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "未认证");
             }
         } catch (Exception e) {
+            e.printStackTrace();
             // 处理异常，返回内部服务器错误
             sendErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "服务器错误"+e.getMessage());
         }
