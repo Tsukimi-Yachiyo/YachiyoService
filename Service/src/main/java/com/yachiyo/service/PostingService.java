@@ -69,4 +69,11 @@ public interface PostingService {
      * 获取自己的帖子
      */
     Result<List<SelfPostResponse>> getMyPosting();
+
+    /**
+     * 获取帖子审核状态
+     * @param postingId 帖子ID
+     * @return 帖子审核状态
+     */
+    Result<PostingReviewStatusResponse> getPostingReviewStatus(Long postingId);
 }

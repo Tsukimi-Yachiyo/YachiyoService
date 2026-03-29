@@ -6,6 +6,7 @@ import com.yachiyo.Utils.FileUrlUtil;
 import com.yachiyo.dto.GetPostingResponse;
 import com.yachiyo.dto.InteractionRequest;
 import com.yachiyo.dto.PostEncapsulateResponse;
+import com.yachiyo.dto.PostingReviewStatusResponse;
 import com.yachiyo.dto.PostStatsResponse;
 import com.yachiyo.dto.SelfPostResponse;
 import com.yachiyo.dto.UploadPostingRequest;
@@ -329,6 +330,44 @@ public class PostingServiceImpl implements PostingService {
             return Result.success(selfPostResponses);
         } catch (Exception e) {
             return Result.error("500","获取自己的帖子失败：",e.getMessage());
+        }
+    }
+
+    @Override
+    public Result<PostingReviewStatusResponse> getPostingReviewStatus(Long postingId) {
+        try {
+            // 获取当前登录用户
+            Long currentUserId = ((User) Objects.requireNonNull(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getPrincipal())).getId();
+
+            // 查询帖子
+            Posting posting = postingMapper.selectById(postingId);
+            if (posting == null) {
+                return Result.error("帖子不存在");
+            }
+
+            // 校验权限：只能查看自己的帖子
+            if (!posting.getUserId().equals(currentUserId)) {
+                return Result.error("无权查看该帖子的审核状态");
+            }
+
+            // 构建响应
+            PostingReviewStatusResponse response = new PostingReviewStatusResponse();
+            response.setPostingId(postingId);
+
+            // 根据isApproved字段确定状态
+            if (posting.getIsApproved() == null) {
+                response.setStatus(com.yachiyo.enumeration.PostingStatus.PENDING);
+            } else if (posting.getIsApproved()) {
+                response.setStatus(com.yachiyo.enumeration.PostingStatus.APPROVED);
+            } else {
+                response.setStatus(com.yachiyo.enumeration.PostingStatus.REJECTED);
+                // 这里可以添加拒绝原因的获取逻辑（如果有的话）
+                // response.setRejectReason(...);
+            }
+
+            return Result.success(response);
+        } catch (Exception e) {
+            return Result.error("500", "获取帖子审核状态失败：", e.getMessage());
         }
     }
 }
