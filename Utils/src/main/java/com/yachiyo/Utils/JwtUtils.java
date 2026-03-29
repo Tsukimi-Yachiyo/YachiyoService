@@ -159,4 +159,16 @@ public class JwtUtils {
             return true;
         }
     }
+
+    /**
+     * 更新JWT令牌
+     * @param token JWT令牌
+     * @param uniqueCode 唯一标识
+     * @return 更新后的JWT令牌
+     */
+    public String updateToken(String token, String uniqueCode) {
+        String userId = getUserIdFromToken(token);
+        String name = getNameFromToken(token);
+        return generateToken(Long.parseLong(userId), name, uniqueCode);
+    }
 }

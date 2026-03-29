@@ -2,12 +2,14 @@ package com.yachiyo.filter;
 
 import cn.hutool.core.text.AntPathMatcher;
 import com.yachiyo.Config.SecuritySafeToolConfig;
+import com.yachiyo.Config.YamlConfigProperties;
 import com.yachiyo.entity.User;
 import com.yachiyo.Utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component @Slf4j
+@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtils jwtUtils;
 
-    @Value("${security.open-api}")
-    private String[] openApi;
+    private final YamlConfigProperties yamlConfigProperties;
 
     @Autowired
     private SecuritySafeToolConfig securitySafeToolConfig;
@@ -63,6 +65,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 }else{
                     authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
                 }
+                String newToken = jwtUtils.updateToken(jwt, securitySafeToolConfig.getUnique(Long.parseLong(userId)));
+                response.setHeader(jwtUtils.getTokenHeader(), newToken);
+
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
@@ -79,7 +84,8 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String uri = request.getRequestURI();
-        for (String openUrl : openApi) {
+        System.out.println(uri);
+        for (String openUrl : yamlConfigProperties.getOpenApi()) {
             if (pathMatcher.match(openUrl, uri)) {
                 return true;
             }
