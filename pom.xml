@@ -23,7 +23,7 @@
 	</developers>
 	<modules>
 		<module>GatewayService</module>
-		<module>PostingService</module>
+		<module>ContentService</module>
 		<module>CoinService</module>
 		<module>UserService</module>
 		<module>FileService</module>
