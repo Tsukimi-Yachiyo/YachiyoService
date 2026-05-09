@@ -24,11 +24,9 @@
 	<modules>
 		<module>GatewayService</module>
 		<module>PostingService</module>
-		<module>AuthService</module>
 		<module>CoinService</module>
 		<module>UserService</module>
 		<module>FileService</module>
-        <module>ToolService</module>
         <module>AdminService</module>
         <module>ColumnService</module>
         <module>QQBotService</module>

@@ -1,38 +1,38 @@
 package com.yachiyo.UserService.service.Impl;
 
 import com.yachiyo.UserService.client.FileClient;
-import com.yachiyo.UserService.config.FastMethodConfig;
-import com.yachiyo.UserService.dto.PosterDetailResponse;
-import com.yachiyo.UserService.dto.SelfUserDetailResponse;
-import com.yachiyo.UserService.repository.UserDetailRepository;
+import com.yachiyo.UserService.dto.UserDetailDTO;
+import com.yachiyo.UserService.entity.UserDetail;
 import com.yachiyo.UserService.result.Result;
 import com.yachiyo.UserService.service.UserService;
+import com.yachiyo.UserService.tool.FileClientTool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.function.Supplier;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserDetailRepository userDetailRepository;
     private final FileClient fileClient;
+
+    private final R2dbcEntityTemplate template;
 
     private static final String AVATAR_PATH_FORMAT = "%d/avatar.jpg";
 
-    private final FastMethodConfig fastMethodConfig;
+    private final FileClientTool fileClientTool;
 
     private Mono<MultipartFile> filePartToMultipartFile(FilePart filePart) {
         return DataBufferUtils.join(filePart.content())
@@ -85,42 +85,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<Result<SelfUserDetailResponse>> getUserDetail(Long userId) {
-        return userDetailRepository.findById(userId)
-                .map(userDetail -> {
-                    SelfUserDetailResponse resp = new SelfUserDetailResponse();
-                    resp.setUserIntroduction(userDetail.getUserIntroduction());
-                    resp.setUserName(userDetail.getUserName());
-                    resp.setUserCity(userDetail.getUserCity());
-                    resp.setUserGender(userDetail.getUserGender());
-                    resp.setUserBirthday(userDetail.getUserBirthday());
-                    return Result.success(resp);
-                })
-                .defaultIfEmpty(Result.error("404", "用户不存在"));
-    }
-
-    @Override
-    public Mono<Result<Boolean>> updateUserDetail(Long userId, SelfUserDetailResponse selfUserDetailResponse) {
-        return userDetailRepository.findById(userId)
+    public Mono<Result<Boolean>> updateUserDetail(Long userId, UserDetailDTO userDetailDTO) {
+        return template.selectOne(Query.query(Criteria.where("id").is(userId)), UserDetail.class)
                 .flatMap(existUser -> {
-                    if (selfUserDetailResponse.getUserName() != null) {
-                        existUser.setUserName(selfUserDetailResponse.getUserName());
+                    if (userDetailDTO.getUserName() != null) {
+                        existUser.setUserName(userDetailDTO.getUserName());
                     }
-                    if (selfUserDetailResponse.getUserIntroduction() != null) {
-                        existUser.setUserIntroduction(selfUserDetailResponse.getUserIntroduction());
+                    if (userDetailDTO.getUserIntroduction() != null) {
+                        existUser.setUserIntroduction(userDetailDTO.getUserIntroduction());
                     }
-                    if (selfUserDetailResponse.getUserCity() != null) {
-                        existUser.setUserCity(selfUserDetailResponse.getUserCity());
+                    if (userDetailDTO.getUserCity() != null) {
+                        existUser.setUserCity(userDetailDTO.getUserCity());
                     }
-                    if (selfUserDetailResponse.getUserGender() != null) {
-                        existUser.setUserGender(selfUserDetailResponse.getUserGender());
+                    if (userDetailDTO.getUserGender() != null) {
+                        existUser.setUserGender(userDetailDTO.getUserGender());
                     }
-                    if (selfUserDetailResponse.getUserBirthday() != null) {
-                        existUser.setUserBirthday(selfUserDetailResponse.getUserBirthday());
+                    if (userDetailDTO.getUserBirthday() != null) {
+                        existUser.setUserBirthday(userDetailDTO.getUserBirthday());
                     }
-                    return userDetailRepository.save(existUser);
+                    return template.update(existUser);
                 })
-                .map(saved -> Result.success(true))
+                .map(_ -> Result.success(true))
                 .defaultIfEmpty(Result.error("404", "用户不存在"));
     }
 
@@ -128,7 +113,7 @@ public class UserServiceImpl implements UserService {
     public Mono<Result<Boolean>> updateUserAvatar(Long userId, FilePart userAvatar) {
         String filePath = String.format(AVATAR_PATH_FORMAT, userId);
         return filePartToMultipartFile(userAvatar)
-                .flatMap(multipartFile -> fastMethodConfig.callFileClient(
+                .flatMap(multipartFile -> fileClientTool.callFileClient(
                         () -> Result.success(fileClient.uploadFile(filePath, multipartFile)),
                         "上传头像失败"
                 ))
@@ -139,37 +124,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<Result<String>> getUserAvatar(Long userId) {
         String filePath = String.format(AVATAR_PATH_FORMAT, userId);
-        return fastMethodConfig.callFileClient(
+        return fileClientTool.callFileClient(
                 () -> Result.success(fileClient.getUrl(filePath, 1000L)),
                 "获取头像URL失败"
         )
                 .map(Result::success)
                 .onErrorResume(e -> Mono.just(Result.error("500", e.getMessage())));
-    }
-
-    @Override
-    public Mono<Result<PosterDetailResponse>> getPosterDetail(Long userId) {
-        String filePath = String.format(AVATAR_PATH_FORMAT, userId);
-        return userDetailRepository.findById(userId)
-                .flatMap(userDetail ->
-                        fastMethodConfig.callFileClient(
-                                () -> Result.success(fileClient.getUrl(filePath, System.currentTimeMillis())),
-                                "获取头像URL失败"
-                        )
-                                .map(url -> {
-                                    PosterDetailResponse response = new PosterDetailResponse();
-                                    response.setUserName(userDetail.getUserName());
-                                    response.setUserAvatar(url);
-                                    return Result.success(response);
-                                })
-                                .onErrorResume(e -> {
-                                    log.warn("获取头像URL失败，userId={}, error={}", userId, e.getMessage());
-                                    PosterDetailResponse response = new PosterDetailResponse();
-                                    response.setUserName(userDetail.getUserName());
-                                    response.setUserAvatar(null);
-                                    return Mono.just(Result.success(response));
-                                })
-                )
-                .defaultIfEmpty(Result.error("404", "用户不存在：" + userId));
     }
 }
