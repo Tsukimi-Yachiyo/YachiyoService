@@ -43,5 +43,42 @@ spring:
 
   profiles:
     include: secret
+  # 邮箱配置
+  mail:
+    host: smtp.qq.com
+    port: 465
+    username: ${email.username}
+    password: ${email.password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+jwt:
+  secret: "12345678901234567890123456789012"
+  expiration: 3600000
+  token-header: "Authorization"
+  token-prefix: "Bearer "
+
+custom:
+  config:
+    # 推荐任务间隔
+    recommendation:
+      interval: "0 0/10 * * * ?" # 每10分钟执行一次
+      enable: true # 是否启用推荐任务
+      message: "初始配置"
+
+    # 日期调度器间隔
+    holiday:
+      interval: "0 0 0/24 * * ?" # 每天0点执行一次
+      enable: true # 是否启用日期调度器
+      message: "初始配置"
+      holiday:
+        url: https://timor.tech/api/holiday/info/{date}
 
 
+    approved:
+      interval: "0 0 0/1 * * ?" # 每1小时执行一次
+      enable: true # 是否启用审批任务
+      message: "初始配置"

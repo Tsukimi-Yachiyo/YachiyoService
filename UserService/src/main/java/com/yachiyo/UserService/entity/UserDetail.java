@@ -6,6 +6,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 @Data
 @Table("user_detail") // 表名不变
@@ -30,5 +31,11 @@ public class UserDetail {
     private String userGender;
 
     @Column("birthday")
-    private Date userBirthday;
+    private LocalDate userBirthday;
+
+    @Column("qq")
+    private String userQQ;
+
+    @Column("phone")
+    private String userPhone;
 }
